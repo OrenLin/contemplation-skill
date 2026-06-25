@@ -1,8 +1,8 @@
 ---
 name: product-design-0to1
-description: 从 0 到 1 的完整产品设计流程，结合顶级 UI/UX 设计原则、SKILL 工具链协作、移动端适配、性能优化。适用于需要完整产品设计和实现的项目。
-version: 1.0.0
-tags: [product-design, uiux, mobile-first, performance, skill-chain]
+description: 从 0 到 1 的完整产品设计流程，结合顶级 UI/UX 设计原则、SKILL 工具链协作、移动端适配、性能优化、3D/WebGL 项目架构。适用于需要完整产品设计和实现的项目。
+version: 1.1.0
+tags: [product-design, uiux, mobile-first, performance, skill-chain, 3d-webgl, scientific-visualization]
 ---
 
 # 从 0 到 1 的完整产品设计流程
@@ -195,6 +195,39 @@ const Divination = lazy(() => import('../components/tools/Divination'));
 
 **详细踩坑记录**：[WebGL 移动端适配踩坑](./pitfalls/webgl-mobile-adaptation.md)
 
+**3D/WebGL 项目架构**（Three.js / R3F 项目）：
+
+当项目涉及 3D 场景、粒子系统、科学可视化时，需要额外考虑：
+
+1. **Canvas 生命周期管理**
+   - Canvas 必须始终挂载，不能随路由/Tab 切换卸载
+   - 使用 `opacity + pointerEvents` 切换可见性，而非条件渲染
+   - AnimatePresence 卸载 Canvas 会导致 WebGL 上下文丢失
+
+2. **z-index 层级地狱**
+   - 3D Canvas 固定底层（z-0），UI 面板浮于上层（z-20+）
+   - 多个浮动面板之间需要明确层级关系（控制板 z-30 > 信息面板 z-20）
+   - 避免使用 `absolute` 定位面板，改用 `fixed` 避免滚动影响
+
+3. **粒子系统科学分层**
+   - 按物理过程分层：快中子、热中子、裂变碎片、伽马光子、切伦科夫辐射
+   - 每层独立控制粒子数量、颜色、运动方式
+   - 使用 `AdditiveBlending` 实现发光叠加效果
+   - 粒子总数建议：背景 3000+ / 动态粒子 5000+
+
+4. **响应式 3D 场景**
+   - PC 端：左右面板 + 中央 3D 场景
+   - 移动端：底部弹出面板 + 全屏 3D 场景
+   - 设备检测：User Agent + 屏幕宽度 + 触摸能力三重判断
+   - 支持手动切换 PC/Mobile 模式并持久化
+
+5. **科学可视化参数**
+   - 基于真实物理数据设定参数范围（如 PWR：325°C、15.5MPa）
+   - 启动过程分阶段：预热→升压→临界→稳定运行
+   - 颜色随状态变化：温度低→蓝，温度高→红
+
+**详细踩坑记录**：[3D/WebGL 架构踩坑](./pitfalls/3d-webgl-architecture.md)
+
 **使用工具**：
 - `test-driven-development`：测试驱动开发
 - `executing-plans`：执行实现计划
@@ -370,6 +403,8 @@ const Divination = lazy(() => import('../components/tools/Divination'));
    - 固定导航栏遮挡
    - 主题切换器位置冲突
    - CSS 动画重置滚动位置
+   - PC端折叠按钮设计（新增）
+   - z-index 层级地狱（新增）
 
 3. [性能优化踩坑](./pitfalls/performance.md)
    - 代码分割策略
@@ -380,6 +415,13 @@ const Divination = lazy(() => import('../components/tools/Divination'));
    - 触摸反馈设计
    - 手势支持
    - 新手引导设计
+
+5. [3D/WebGL 架构踩坑](./pitfalls/3d-webgl-architecture.md)（新增）
+   - Canvas 生命周期管理（AnimatePresence 导致 WebGL 上下文丢失）
+   - z-index 层级地狱（多面板重叠问题）
+   - 粒子系统性能优化（科学分层设计）
+   - 响应式 3D 场景布局（PC/移动端分离）
+   - 科学可视化参数校准（基于真实物理数据）
 
 ---
 
@@ -418,6 +460,37 @@ const Divination = lazy(() => import('../components/tools/Divination'));
 ```
 
 **详细文档**：[抽签工具优化文档](./examples/divination-optimization.md)
+
+### 案例 3：核反应堆模拟器从 0 到 1
+
+**项目背景**：创建高质量 3D 交互式核反应堆网页，用于教育目的
+
+**设计过程**：
+1. 使用 `brainstorming` 探索产品方向（教育可视化）
+2. 技术选型：R3F + Three.js + @react-three/postprocessing
+3. 建立明确 z-index 层级体系（Canvas z-0 < InfoPanel z-20 < ControlPanel z-30 < Navbar z-50）
+4. Tab 切换架构解决面板重叠问题（10+ 次修复失败后重构）
+5. 三重设备检测 + 手动切换 PC/Mobile 模式
+6. 粒子系统科学分层（10500+ 粒子，按物理过程分 7 层）
+7. 基于真实 PWR 参数校准（325°C、15.5MPa、1e14 n/cm²·s）
+8. 启动过程分阶段（预热→升压→临界→稳定运行）
+9. PC端/移动端折叠按钮设计
+10. 单文件打包 + 多平台部署（axureshow/BytePlus）
+
+**关键决策**：
+- 选择 R3F + Three.js（生态成熟，后处理丰富）
+- Canvas 始终挂载，用 opacity 切换可见性（避免 WebGL 上下文丢失）
+- 粒子按物理过程分层（快中子、热中子、裂变碎片、伽马光子、切伦科夫辐射）
+- PC/移动端完全分离布局（而非响应式适配）
+- 使用 `fixed` 替代 `absolute` 避免滚动影响
+
+**核心成果**：
+- 粒子总数：2800 → 10500+
+- 科学准确性：基于真实压水堆物理参数
+- 响应式：三重设备检测 + 手动切换
+- 部署灵活：单文件打包，支持多种部署方式
+
+**详细文档**：[核反应堆模拟器设计文档](./examples/nuclear-reactor-design.md)
 
 ---
 

@@ -239,6 +239,121 @@ body {
 
 ---
 
+## 问题 8：PC端面板折叠按钮不明显（核反应堆项目）
+
+### 症状
+- 用户不知道控制面板和仪表盘可以折叠
+- 折叠后找不到展开按钮
+
+### 根本原因
+缺少明确的折叠/展开交互提示
+
+### 解决方案
+**折叠按钮设计**：
+- 固定在面板顶部，宽度 100%
+- 使用醒目的颜色和图标（◀/▶）
+- 添加悬停和点击动画
+
+```tsx
+{/* PC端折叠按钮 */}
+<motion.button
+  onClick={() => setPanelVisible(false)}
+  className="w-full mb-2 py-1.5 rounded-lg bg-black/80 backdrop-blur-md border border-cyan-400/40 text-cyan-400 text-[11px] font-bold tracking-wider flex items-center justify-center gap-2 font-body hover:bg-cyan-500/10 hover:border-cyan-400/70 transition-all"
+  whileHover={{ scale: 1.02 }}
+  whileTap={{ scale: 0.98 }}
+>
+  <span>◀ 点击折叠控制台</span>
+</motion.button>
+
+{/* 展开按钮（折叠后显示） */}
+<motion.button
+  onClick={() => setPanelVisible(true)}
+  className="fixed top-20 left-4 z-20 py-3 px-3 rounded-lg bg-black/80 backdrop-blur-md border border-cyan-400/60 text-cyan-400 text-[11px] font-bold tracking-wider flex items-center gap-2 font-body hover:bg-cyan-500/15 hover:border-cyan-400 transition-all shadow-[0_0_15px_rgba(0,212,255,0.2)]"
+  whileHover={{ scale: 1.05 }}
+  whileTap={{ scale: 0.95 }}
+>
+  <span className="animate-pulse">▶</span>
+  <span>展开控制台</span>
+</motion.button>
+```
+
+**移动端折叠提示**：
+- 弹出面板顶部显示"▼ 点击折叠面板"
+- 面板未打开时底部显示"▲ 点击上方按钮操作"
+- 使用动画提示（上下浮动）
+
+```tsx
+{/* 移动端折叠提示按钮 */}
+<motion.button
+  onClick={() => setMobilePanel(null)}
+  className="w-full mb-2 py-2 rounded-lg bg-black/80 backdrop-blur-md border border-cyan-400/40 text-cyan-400 text-xs font-bold tracking-wider flex items-center justify-center gap-2 font-body"
+  whileTap={{ scale: 0.97 }}
+>
+  <span>▼ 点击折叠面板</span>
+</motion.button>
+
+{/* 未打开时的提示 */}
+{!mobilePanel && (
+  <motion.div
+    className="absolute bottom-20 left-1/2 -translate-x-1/2 z-10 pointer-events-none"
+    animate={{ y: [0, -3, 0] }}
+    transition={{ duration: 1.5, repeat: Infinity }}
+  >
+    <span className="text-[10px] text-cyan-400 tracking-widest font-mono">▲ 点击上方按钮操作</span>
+  </motion.div>
+)}
+```
+
+**关键点**：
+- 折叠按钮必须居中且宽度 100%
+- 使用脉冲动画吸引注意力
+- 展开按钮添加发光阴影效果
+
+---
+
+## 问题 9：z-index 层级地狱（核反应堆项目）
+
+### 症状
+- InfoPanel 覆盖控制面板和仪表盘
+- 面板之间相互遮挡
+- 修改 10+ 次仍无法解决
+
+### 根本原因
+- 使用 `absolute` 定位导致受滚动影响
+- 多个面板 z-index 没有明确层级关系
+- 3D Canvas 和 UI 面板层级混乱
+
+### 解决方案
+**明确层级体系**：
+```
+z-0: 3D Canvas（底层）
+z-10: 标题、状态指示器（装饰层）
+z-20: InfoPanel（信息层）
+z-30: 控制面板/仪表盘（交互层）
+z-50: 顶部导航栏（最高层）
+```
+
+**使用 `fixed` 替代 `absolute`**：
+```tsx
+{/* ❌ 错误：absolute 受滚动影响 */}
+<div className="absolute top-20 left-4 z-20">
+  <ControlPanel />
+</div>
+
+{/* ✅ 正确：fixed 固定在视口 */}
+<div className="fixed top-20 left-4 z-30">
+  <ControlPanel />
+</div>
+```
+
+**关键原则**：
+- 3D Canvas 始终在最底层（z-0）
+- 交互面板（控制板/仪表盘）z-index 高于信息面板
+- 使用 `fixed` 定位避免滚动影响
+- 顶部导航栏 z-50 最高
+
+---
+
 ## 验证清单
 
 - [ ] 底部按钮避开固定导航栏（使用 `marginBottom`）
@@ -248,6 +363,10 @@ body {
 - [ ] 安全区域适配完整（顶部、底部、左右）
 - [ ] 触摸区域最小 44x44px
 - [ ] 无横向溢出
+- [ ] PC端折叠按钮明显且易用
+- [ ] 移动端折叠提示按钮居中显示
+- [ ] 折叠/展开动画流畅
+- [ ] z-index 层级关系明确（Canvas < InfoPanel < ControlPanel < Navbar）
 - [ ] 在 iOS Safari、Android Chrome、微信浏览器中测试
 
 ---
@@ -257,3 +376,4 @@ body {
 - [MDN: env()](https://developer.mozilla.org/en-US/docs/Web/CSS/env)
 - [CSS Tricks: Safe Area Insets](https://css-tricks.com/the-notch-and-css/)
 - [Can I Use: dvh](https://caniuse.com/viewport-unit-variants)
+- [MDN: position: fixed](https://developer.mozilla.org/en-US/docs/Web/CSS/position#fixed)
