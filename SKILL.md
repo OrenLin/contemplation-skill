@@ -1,250 +1,165 @@
 ---
-name: contemplation-immersive-tool
-description: Build immersive contemplation/meditation tools with multi-theme WebGL animated backgrounds, mobile-first layout, and performance optimization. Use this when creating meditation apps, contemplation spaces, relaxation tools with animated shader backgrounds, multi-theme switching interfaces, or when adapting WebGL shader effects (from reactbits.dev or similar) for mobile screens. Covers shader UV normalization fixes, mobile safe-area layout, code-splitting, and onboarding UX.
-license: MIT
+name: product-design-0to1
+description: 从 0 到 1 的完整产品设计流程，结合顶级 UI/UX 设计原则、SKILL 工具链协作、移动端适配、性能优化。适用于需要完整产品设计和实现的项目。
+version: 1.0.0
+tags: [product-design, uiux, mobile-first, performance, skill-chain]
 ---
 
-# Contemplation Immersive Tool
+# 从 0 到 1 的完整产品设计流程
 
-Build production-grade immersive tools with animated WebGL backgrounds that work flawlessly across desktop and mobile. This skill encodes the complete workflow — from design brainstorming through shader adaptation, mobile layout, performance tuning, and onboarding UX — distilled from a real production deployment.
+## 概述
 
-## When To Use
+本 SKILL 定义了一套完整的产品设计和实现流程，从需求分析到最终发布，结合顶级 UI/UX 设计原则和 TRAE SKILL 工具链协作。适用于需要完整产品设计和实现的项目。
 
-- Creating meditation, contemplation, or relaxation tools with animated backgrounds
-- Adapting WebGL shader effects (e.g. from [reactbits.dev](https://www.reactbits.dev)) for mobile screens
-- Building multi-theme switching interfaces with WebGL backgrounds
-- Fixing shader "over-zoom" issues where effects appear magnified on mobile
-- Implementing mobile-first immersive layouts with safe-area handling
-- Optimizing large React SPA bundle sizes via code-splitting
+## 核心原则
 
-## Critical Pitfalls (Avoid These)
+1. **移动优先**：所有设计决策优先考虑移动端体验
+2. **性能至上**：每个技术选型都要考虑性能影响
+3. **用户中心**：所有功能围绕用户实际需求设计
+4. **渐进增强**：基础功能优先，高级功能逐步添加
+5. **可维护性**：代码结构清晰，便于后续迭代
 
-These are the exact traps hit during development. Each has a verified fix below.
+## 完整流程
 
-### Pitfall 1: Shader Over-Zoom on Mobile
+### 阶段 1：需求分析与设计
 
-**Symptom:** Effect looks correct on desktop but appears magnified 5-10x on mobile, showing only a tiny fragment of the intended visual.
+**目标**：明确产品定位、核心功能、目标用户
 
-**Root Cause:** Using `vUv` (0-1 range) with a "contain" aspect-ratio correction. The contain math had x/y swapped, causing vertical stretch on portrait screens.
+**使用工具**：
+- `brainstorming`：头脑风暴，探索产品方向和核心功能
+- `writing-plans`：制定详细实现计划
 
-```glsl
-// ❌ BROKEN: vUv + contain mode
-varying vec2 vUv;
-void main() {
-  vec2 uv = vUv * 2.0 - 1.0;
-  float aspect = uResolution.x / uResolution.y;
-  if (aspect > 1.0) {
-    uv.x *= aspect;   // landscape
-  } else {
-    uv.y /= aspect;   // portrait — WRONG, stretches vertically
-  }
-}
-```
+**关键步骤**：
 
-**Fix:** Use `gl_FragCoord`-based normalization with y as the reference axis. This auto-adapts to any aspect ratio without conditional contain logic.
+1. **产品定位**
+   - 解决什么问题？
+   - 目标用户是谁？
+   - 核心价值主张是什么？
 
-```glsl
-// ✅ CORRECT: gl_FragCoord normalization
-void main() {
-  vec2 uv = (gl_FragCoord.xy * 2.0 - uResolution.xy) / uResolution.y;
-  uv /= uScale;  // control overall zoom via uScale uniform
-}
-```
+2. **功能规划**
+   - 核心功能列表（MVP）
+   - 功能优先级排序
+   - 功能间的依赖关系
 
-**Why it works:** Dividing by `uResolution.y` normalizes so that vertical extent is always -1..1 (after the *2-1 centering). Horizontal extent scales automatically with aspect ratio. No contain/cover branching needed.
+3. **信息架构**
+   - 页面结构
+   - 导航逻辑
+   - 数据流向
 
-### Pitfall 2: uResolution Using CSS Pixels
+4. **交互设计**
+   - 用户流程图
+   - 关键交互场景
+   - 异常处理流程
 
-**Symptom:** Shader renders at wrong scale or aspect even after the UV fix.
+**输出**：
+- 产品需求文档（PRD）
+- 功能清单
+- 信息架构图
+- 交互流程图
 
-**Root Cause:** Passing CSS pixel dimensions instead of device pixel dimensions.
+**参考案例**：
+- [沉思工具设计文档](./examples/contemplation-design.md)：从 4 个主题扩展到 10 个主题的完整设计过程
 
-```javascript
-// ❌ BROKEN: CSS pixels
-program.uniforms.uResolution.value = [container.clientWidth, container.clientHeight, ...];
-```
+---
 
-**Fix:** Always use `gl.canvas.width/height` (device pixels) after `renderer.setSize()`.
+### 阶段 2：UI/UX 设计
 
-```javascript
-// ✅ CORRECT: device pixels
-function resize() {
-  const { width, height } = container.getBoundingClientRect();
-  renderer.setSize(width, height);
-  program.uniforms.uResolution.value = [
-    gl.canvas.width,
-    gl.canvas.height,
-    gl.canvas.width / gl.canvas.height,
-  ];
-}
-```
+**目标**：创建符合顶级标准的用户界面和交互体验
 
-### Pitfall 3: 100vmax Square Container Causing Zoom
+**设计原则**：
 
-**Symptom:** Even with correct shader, effects still appear zoomed because the container itself is a forced square.
+1. **视觉层次**
+   - 使用字体大小、颜色、间距建立清晰的视觉层次
+   - 重要信息突出显示，次要信息适当弱化
+   - 避免视觉噪音，保持界面简洁
 
-**Root Cause:** Wrapper used `100vmax` to create a centered square, then `overflow-hidden` cropped it. On portrait phones this cropped most of the effect.
+2. **一致性**
+   - 颜色系统统一（主色、辅色、强调色）
+   - 字体系统统一（标题、正文、辅助文字）
+   - 间距系统统一（4px、8px、16px、24px、32px、48px、64px）
+   - 圆角系统统一（4px、8px、12px、16px、24px）
 
-```tsx
-// ❌ BROKEN: forced square container
-<div style={{ width: '100vmax', height: '100vmax', position: 'absolute', inset: 0 }} />
-```
+3. **反馈机制**
+   - 每个用户操作都有即时反馈
+   - 加载状态明确（骨架屏、进度条、加载动画）
+   - 错误提示友好（明确的错误信息、可操作的解决方案）
 
-**Fix:** Remove the square container. Let the shader fill the actual screen aspect ratio.
+4. **可访问性**
+   - 颜色对比度符合 WCAG 标准
+   - 支持键盘导航
+   - 支持屏幕阅读器
+   - 提供高对比度模式、大字体模式、减少动画模式
 
-```tsx
-// ✅ CORRECT: fill screen, shader handles aspect
-<div className="absolute inset-0 overflow-hidden">
-  <EvilEye />
-</div>
-```
+5. **情感化设计**
+   - 微交互提升体验（按钮悬停、点击反馈）
+   - 适当的动画效果（过渡、加载、成功）
+   - 个性化元素（用户头像、自定义主题）
 
-### Pitfall 4: Bottom Button Obscured By Fixed Nav
+**移动端设计要点**：
 
-**Symptom:** "Draw again" button hidden behind the fixed bottom navigation bar.
+1. **触摸友好**
+   - 点击区域最小 44x44px
+   - 避免误触设计（按钮间距、边缘留白）
+   - 手势支持（滑动、长按、双击）
 
-**Fix:** Add `marginBottom` equal to nav height plus safe-area inset.
+2. **安全区域**
+   - 适配刘海屏、灵动岛
+   - 底部导航栏避开 Home Indicator
+   - 使用 `env(safe-area-inset-*)` 处理
 
-```tsx
-<div style={{ marginBottom: 'calc(64px + env(safe-area-inset-bottom))' }}>
-```
+3. **视口适配**
+   - 使用 `dvh` 替代 `vh`，避免地址栏影响
+   - 响应式布局（flex、grid）
+   - 断点设计（320px、375px、414px、768px、1024px）
 
-### Pitfall 5: Theme Switcher Overlapping Accessibility Button
+4. **性能优化**
+   - 图片懒加载
+   - 虚拟滚动（长列表）
+   - 防抖节流（滚动、输入）
 
-**Symptom:** Right-side theme switcher collides with the fixed accessibility button (`fixed bottom-24 right-4`) and the quote card border.
+**使用工具**：
+- `frontend-design`：创建高质量的前端界面
+- `frontend-skill`：前端设计最佳实践
+- `theme-factory`：主题系统管理
 
-**Fix:** Move theme switcher to the left side; move top controls (back/language) to top-center.
+**输出**：
+- UI 设计稿
+- 交互原型
+- 设计规范文档
+- 组件库
 
-### Pitfall 6: CSS Animation Resetting Scroll Position
+**参考案例**：
+- [语录卡片设计](./examples/quote-card-design.md)：毛玻璃效果、左右箭头、折叠展开
+- [主题切换器设计](./examples/theme-switcher-design.md)：左侧纵向布局、避开无障碍按钮
 
-**Symptom:** Scrolling down in a panel causes it to snap back to top.
+---
 
-**Root Cause:** A `transform: scaleY()` animation with `both` fill mode resets the internal `overflow-y-auto` scroll position on each frame.
+### 阶段 3：技术实现
 
-**Fix:** Use opacity-only animations; never `transform` on scroll containers.
+**目标**：将设计转化为可运行的代码
 
-### Pitfall 7: vh Unit Jitter On Mobile
+**技术栈选择原则**：
 
-**Symptom:** Layout jitters when mobile browser address bar shows/hides.
+1. **轻量优先**
+   - 选择体积小、性能好的库
+   - 避免过度依赖大型框架
+   - 按需加载，减少首屏体积
 
-**Fix:** Use `dvh` (dynamic viewport height) instead of `vh`.
+2. **生态成熟**
+   - 选择社区活跃、维护良好的库
+   - 优先选择有 TypeScript 支持的库
+   - 考虑长期维护和升级
 
-## Workflow
+3. **性能导向**
+   - WebGL 效果选择 OGL（比 Three.js 轻量）
+   - 状态管理选择 Zustand（比 Redux 轻量）
+   - 样式方案选择 Tailwind CSS（原子化，体积小）
 
-This skill follows the brainstorming → spec → plan → implement cycle used in production.
-
-### Phase 1: Brainstorming (use brainstorming skill)
-
-Before any code, run the brainstorming skill to:
-1. Explore intent — what themes, what moods, what interactions
-2. Propose 2-3 approaches with tradeoffs
-3. Present design sections, get approval per section
-4. Write spec to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`
-
-**Key questions to resolve:**
-- How many themes? (production used 10)
-- How many quotes per theme? (production used 10)
-- What interaction modes? (tap card, arrows, swipe, collapse/expand)
-- Onboarding needed? (yes — first-visit guide)
-
-### Phase 2: Spec & Plan (use writing-plans skill)
-
-Convert the approved design into an implementation plan with:
-- File structure (background components per theme)
-- Data model (themes + quotes with zh/en)
-- State management (current theme, current quote, expanded/collapsed)
-- Deployment target (Vercel SPA with URL routing)
-
-### Phase 3: Source Shader Components
-
-Pull animated background components from [reactbits.dev](https://www.reactbits.dev) — specifically the backgrounds section. Each background ships as a self-contained React + OGL component with configurable props (colors, speed, scale, etc.).
-
-**Components used in production:**
-- Galaxy, Ferrofluid, LetterGlitch, Balatro (original 4 themes)
-- ColorBends, Beams, Hyperspeed, Iridescence, Aurora, EvilEye (added 6 themes)
-
-### Phase 4: Shader Adaptation (THE critical step)
-
-For EVERY background component, apply the UV normalization fix. This is non-negotiable for mobile.
-
-1. Open the component's fragment shader
-2. Replace `vUv`-based UV with `gl_FragCoord`-based UV (see Pitfall 1)
-3. Ensure `uResolution` uniform is declared as `vec3` (width, height, aspect)
-4. Update the JS side to pass device pixels (see Pitfall 2)
-5. Add a `uScale` uniform if not present; expose it as a prop
-6. Remove any `100vmax` square wrapper (see Pitfall 3)
-7. Tune `uScale` per theme — start at 0.5-0.8, adjust so the effect fills the screen without cropping key visual elements
-
-**Per-theme scale tuning reference (portrait mobile):**
-- EvilEye: scale 0.5 (eye occupies ~50% screen height)
-- Beams: beam positions ±0.6 (was ±2, off-screen)
-- ColorBends/Hyperspeed/Iridescence/Aurora: scale 0.6-0.8
-
-### Phase 5: Mobile Layout
-
-Apply these layout rules to the immersive container:
-
-```tsx
-<div className="fixed inset-0 overflow-hidden bg-black" style={{ height: '100dvh' }}>
-  {/* Background layer — pointerEvents toggle based on card state */}
-  <div
-    className="absolute inset-0"
-    style={{ pointerEvents: quoteExpanded ? 'none' : 'auto', touchAction: 'none' }}
-  >
-    {renderBackground()}
-  </div>
-
-  {/* Top controls — CENTERED to avoid left-side theme switcher */}
-  <div
-    className="absolute top-0 left-1/2 -translate-x-1/2 z-40"
-    style={{ paddingTop: 'calc(0.75rem + env(safe-area-inset-top))' }}
-  />
-
-  {/* Theme switcher — LEFT side, vertical, scrollable */}
-  <div
-    className="absolute top-1/2 -translate-y-1/2 left-3 z-40 flex flex-col gap-1.5 max-h-[60vh] overflow-y-auto"
-    style={{ marginTop: 'calc(2rem + env(safe-area-inset-top))' }}
-  />
-
-  {/* Quote card — centered, smaller on mobile */}
-  <div className="absolute inset-0 z-20 flex items-center justify-center">
-    <div className="w-[80%] max-w-[300px]" />
-  </div>
-</div>
-```
-
-### Phase 6: Performance — Code Splitting
-
-Large SPAs bundle everything into one JS file. Split it.
-
-**Step 1: Dynamic import tool components**
-
-```tsx
-import { lazy, Suspense } from 'react';
-
-const Contemplation = lazy(() => import('../components/tools/Contemplation'));
-const Divination = lazy(() => import('../components/tools/Divination'));
-
-function LoadingFallback() {
-  return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black">
-      <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-white" />
-    </div>
-  );
-}
-
-// Usage
-<Suspense fallback={<LoadingFallback />}>
-  <Contemplation onBack={handleBack} />
-</Suspense>
-```
-
-**Step 2: Vite manualChunks for vendor libs**
+**代码分割策略**：
 
 ```typescript
 // vite.config.ts
 build: {
-  sourcemap: 'hidden',
   rollupOptions: {
     output: {
       manualChunks: {
@@ -257,106 +172,289 @@ build: {
 },
 ```
 
-**Measured impact:** Main bundle 1018KB → 519KB. Contemplation chunk isolated at ~91KB. Vendor chunks cached across navigations.
+**动态导入**：
 
-### Phase 7: URL Routing For Direct Access
+```typescript
+// 工具组件按需加载
+const Contemplation = lazy(() => import('../components/tools/Contemplation'));
+const Divination = lazy(() => import('../components/tools/Divination'));
 
-To allow direct links like `/contemplation`, sync a URL hash/query param with the active tool state, and add a `vercel.json` rewrite so SPA routes don't 404.
-
-```json
-// vercel.json
-{
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
-}
+<Suspense fallback={<LoadingFallback />}>
+  <Contemplation onBack={handleBack} />
+</Suspense>
 ```
 
-### Phase 8: Onboarding UX
+**WebGL 效果适配**：
 
-First-visit guide, shown once, dismissible three ways (button, backdrop tap, escape):
+从 [reactbits.dev](https://www.reactbits.dev) 获取 WebGL 效果组件后，需要进行移动端适配：
 
-```tsx
-const [guideVisible, setGuideVisible] = useState(false);
+1. **UV 归一化**：使用 `gl_FragCoord` 替代 `vUv`
+2. **分辨率传递**：使用设备像素而非 CSS 像素
+3. **缩放控制**：添加 `uScale` uniform 控制整体缩放
+4. **容器适配**：移除 `100vmax` 强制正方形容器
 
-useEffect(() => {
-  if (!localStorage.getItem('contemplation-guide-seen')) {
-    setGuideVisible(true);
-  }
-}, []);
+**详细踩坑记录**：[WebGL 移动端适配踩坑](./pitfalls/webgl-mobile-adaptation.md)
 
-const dismissGuide = useCallback(() => {
-  setGuideVisible(false);
-  localStorage.setItem('contemplation-guide-seen', 'true');
-}, []);
+**使用工具**：
+- `test-driven-development`：测试驱动开发
+- `executing-plans`：执行实现计划
+
+**输出**：
+- 可运行的代码
+- 单元测试
+- 性能测试报告
+
+---
+
+### 阶段 4：移动端适配与优化
+
+**目标**：确保在所有移动设备上都有良好体验
+
+**适配清单**：
+
+1. **视口适配**
+   - [ ] 使用 `100dvh` 替代 `100vh`
+   - [ ] 使用 `env(safe-area-inset-*)` 处理安全区域
+   - [ ] 底部按钮避开固定导航栏
+
+2. **布局适配**
+   - [ ] 主题切换器放在左侧，避开右侧无障碍按钮
+   - [ ] 顶部控制栏居中，避免与侧边栏冲突
+   - [ ] 滚动容器不使用 `transform` 动画
+
+3. **性能优化**
+   - [ ] 代码分割，主包 < 500KB
+   - [ ] 图片懒加载
+   - [ ] 虚拟滚动（长列表）
+   - [ ] 防抖节流
+
+4. **交互优化**
+   - [ ] 触摸反馈（点击、滑动、长按）
+   - [ ] 手势支持（左右滑动切换）
+   - [ ] 新手引导（首次访问）
+
+**详细踩坑记录**：[移动端布局踩坑](./pitfalls/mobile-layout.md)
+
+**使用工具**：
+- `dogfood`：探索性测试，发现 UX 问题
+
+**输出**：
+- 移动端适配报告
+- 性能优化报告
+- 测试报告
+
+---
+
+### 阶段 5：测试与发布
+
+**目标**：确保产品质量，顺利发布
+
+**测试清单**：
+
+1. **功能测试**
+   - [ ] 核心功能正常
+   - [ ] 边界情况处理
+   - [ ] 错误提示友好
+
+2. **兼容性测试**
+   - [ ] iOS Safari
+   - [ ] Android Chrome
+   - [ ] 微信内置浏览器
+   - [ ] 不同屏幕尺寸
+
+3. **性能测试**
+   - [ ] 首屏加载时间 < 3s
+   - [ ] 交互响应时间 < 100ms
+   - [ ] 内存占用合理
+
+4. **可访问性测试**
+   - [ ] 键盘导航
+   - [ ] 屏幕阅读器
+   - [ ] 高对比度模式
+
+**发布流程**：
+
+1. **代码审查**
+   - 代码质量检查
+   - 性能检查
+   - 安全检查
+
+2. **构建部署**
+   ```bash
+   npm run build
+   git add -A
+   git commit -m "feat: 完成功能 X"
+   git push origin main
+   ```
+
+3. **Vercel 自动部署**
+   - 配置 `vercel.json` 支持 SPA 路由
+   - 自动构建和部署
+   - 生成预览链接
+
+4. **发布后验证**
+   - 访问生产环境
+   - 验证核心功能
+   - 监控错误日志
+
+**使用工具**：
+- `dogfood`：发布前最终测试
+
+**输出**：
+- 测试报告
+- 发布清单
+- 监控报告
+
+---
+
+## SKILL 工具链
+
+### 设计阶段
+
+| 工具 | 用途 | 使用时机 |
+|------|------|----------|
+| `brainstorming` | 头脑风暴，探索产品方向 | 项目启动时 |
+| `writing-plans` | 制定详细实现计划 | 需求明确后 |
+| `frontend-design` | 创建高质量前端界面 | UI 设计时 |
+| `theme-factory` | 主题系统管理 | 需要多主题时 |
+
+### 实现阶段
+
+| 工具 | 用途 | 使用时机 |
+|------|------|----------|
+| `test-driven-development` | 测试驱动开发 | 编写代码时 |
+| `executing-plans` | 执行实现计划 | 按计划实现时 |
+| `algorithmic-art` | 算法艺术生成 | 需要生成艺术效果时 |
+
+### 测试阶段
+
+| 工具 | 用途 | 使用时机 |
+|------|------|----------|
+| `dogfood` | 探索性测试 | 发布前测试 |
+
+### 优化阶段
+
+| 工具 | 用途 | 使用时机 |
+|------|------|----------|
+| `consulting-analysis` | 数据分析和报告 | 需要性能分析时 |
+
+---
+
+## 外部资源
+
+### 设计资源
+
+- [reactbits.dev](https://www.reactbits.dev)：React 组件库，包含 WebGL 效果
+- [The Book of Shaders](https://thebookofshaders.com/)：Shader 学习资源
+- [OGL 文档](https://github.com/oframe/ogl)：轻量级 WebGL 库
+
+### 技术资源
+
+- [React 文档](https://react.dev/)：React 官方文档
+- [Vite 文档](https://vitejs.dev/)：Vite 构建工具
+- [Tailwind CSS](https://tailwindcss.com/)：原子化 CSS 框架
+
+---
+
+## 踩坑记录索引
+
+详细的踩坑记录和解决方案，请参考：
+
+1. [WebGL 移动端适配踩坑](./pitfalls/webgl-mobile-adaptation.md)
+   - Shader 过度放大问题
+   - UV 归一化方案
+   - 分辨率传递问题
+
+2. [移动端布局踩坑](./pitfalls/mobile-layout.md)
+   - 安全区域适配
+   - 固定导航栏遮挡
+   - 主题切换器位置冲突
+   - CSS 动画重置滚动位置
+
+3. [性能优化踩坑](./pitfalls/performance.md)
+   - 代码分割策略
+   - 主包体积优化
+   - 动态导入最佳实践
+
+4. [交互设计踩坑](./pitfalls/interaction.md)
+   - 触摸反馈设计
+   - 手势支持
+   - 新手引导设计
+
+---
+
+## 实际案例
+
+### 案例 1：沉思工具从 0 到 1
+
+**项目背景**：创建一个沉浸式语录浏览工具，支持多主题切换和 WebGL 效果
+
+**设计过程**：
+1. 使用 `brainstorming` 探索产品方向
+2. 使用 `writing-plans` 制定实现计划
+3. 从 reactbits.dev 获取 4 个 WebGL 效果组件
+4. 扩展至 10 个主题，每个主题 10 条语录
+5. 设计语录卡片交互（点击、箭头、滑动）
+6. 移动端适配（安全区域、布局优化）
+7. 性能优化（代码分割，主包从 1018KB 降至 519KB）
+
+**关键决策**：
+- 选择 OGL 而非 Three.js（体积更小）
+- 使用 Zustand 而非 Redux（更轻量）
+- 主题切换器放在左侧（避开右侧无障碍按钮）
+- 语录卡片支持三种交互方式（点击、箭头、滑动）
+
+**详细文档**：[沉思工具设计文档](./examples/contemplation-design.md)
+
+### 案例 2：抽签工具优化
+
+**项目背景**：优化抽签工具的用户体验，解决底部按钮被遮挡问题
+
+**问题**：底部"再抽一签"按钮被固定导航栏遮挡
+
+**解决方案**：
+```typescript
+<div style={{ marginBottom: 'calc(64px + env(safe-area-inset-bottom))' }}>
 ```
 
-Guide covers: theme switching, quote switching (tap/arrows/swipe), collapse/expand, interactive effects after collapse.
+**详细文档**：[抽签工具优化文档](./examples/divination-optimization.md)
 
-### Phase 9: Quote Card Interaction
+---
 
-Three interaction modes, all wired to the same `switchQuote` function:
+## 检查清单
 
-1. **Tap card body** → next quote
-2. **Tap left/right arrow buttons** → prev/next (with `e.stopPropagation()` so they don't trigger the card tap)
-3. **Touch swipe** (>50px horizontal) → prev/next
+### 设计阶段
 
-Arrow buttons: positioned at card edges, half-translated outside, 40px circles, gradient backgrounds, opacity 40% resting / 80% hover.
+- [ ] 产品定位明确
+- [ ] 核心功能清晰
+- [ ] 信息架构合理
+- [ ] 交互流程顺畅
+- [ ] 设计规范完整
 
-## Tech Stack
+### 实现阶段
 
-- **React 18 + TypeScript** — UI framework
-- **OGL** — lightweight WebGL library (preferred over Three.js for shader-only effects)
-- **Vite** — build tool with manualChunks
-- **Tailwind CSS** — atomic styling
-- **Zustand** — state management
-- **Vercel** — deployment with SPA rewrites
+- [ ] 代码结构清晰
+- [ ] 性能考虑充分
+- [ ] 测试覆盖完整
+- [ ] 文档齐全
 
-## Source References
+### 发布阶段
 
-- **Animated backgrounds:** [reactbits.dev](https://www.reactbits.dev) — pull components, then apply shader adaptation (Phase 4)
-- **Shader theory:** [The Book of Shaders](https://thebookofshaders.com/)
-- **OGL docs:** [github.com/oframe/ogl](https://github.com/oframe/ogl)
+- [ ] 功能测试通过
+- [ ] 兼容性测试通过
+- [ ] 性能测试通过
+- [ ] 可访问性测试通过
+- [ ] 生产环境验证通过
 
-## File Structure (Production Reference)
+---
 
-```
-src/
-├── components/
-│   ├── tools/
-│   │   ├── Contemplation.tsx           # main immersive component
-│   │   └── contemplation/
-│   │       ├── quotes.ts               # 10 themes × 10 quotes, zh/en
-│   │       ├── GalaxyBackground.tsx
-│   │       ├── FerrofluidBackground.tsx
-│   │       ├── LetterGlitchBackground.tsx
-│   │       ├── BalatroBackground.tsx
-│   │       ├── ColorBendsBackground.tsx
-│   │       ├── BeamsBackground.tsx
-│   │       ├── HyperspeedBackground.tsx
-│   │       ├── IridescenceBackground.tsx
-│   │       ├── AuroraBackground.tsx
-│   │       ├── EvilEyeBackground.tsx
-│   │       └── EvilEye.jsx              # raw OGL component
-│   └── EvilEye.jsx                     # adapted shader component
-└── pages/
-    └── Tools.tsx                       # lazy-loaded entry
-```
+## 总结
 
-## Verification Checklist
+本 SKILL 提供了一套完整的从 0 到 1 产品设计流程，涵盖需求分析、UI/UX 设计、技术实现、移动端适配、测试发布等各个阶段。结合顶级 UI/UX 设计原则和 TRAE SKILL 工具链，帮助你高效地完成产品设计和实现。
 
-Before shipping, verify each item:
-
-- [ ] Shader uses `gl_FragCoord` normalization, not `vUv` + contain
-- [ ] `uResolution` uses `gl.canvas.width/height` (device pixels)
-- [ ] No `100vmax` square wrappers around shader containers
-- [ ] `uScale` tuned per theme so effect fills screen without cropping
-- [ ] Root container uses `100dvh`, not `100vh`
-- [ ] Fixed elements use `env(safe-area-inset-*)`
-- [ ] Bottom buttons have `marginBottom` clearing the fixed nav
-- [ ] Theme switcher on left, top controls centered (avoid right-side accessibility button)
-- [ ] Scroll containers never have `transform`-based CSS animations
-- [ ] Tool components lazy-loaded with `Suspense` fallback
-- [ ] `manualChunks` configured for vendor libs
-- [ ] `vercel.json` SPA rewrite present
-- [ ] First-visit onboarding guide implemented, dismissible, persisted in localStorage
-- [ ] Quote card supports tap + arrows + swipe
-- [ ] No black bars on any tested aspect ratio (portrait, landscape, square)
+关键要点：
+1. **移动优先**：所有设计决策优先考虑移动端
+2. **性能至上**：每个技术选型都要考虑性能影响
+3. **工具协作**：充分利用 SKILL 工具链提高效率
+4. **踩坑记录**：详细记录踩过的坑，避免重复犯错
+5. **持续优化**：发布后持续监控和优化
