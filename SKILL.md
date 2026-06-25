@@ -1,164 +1,78 @@
 ---
 name: product-design-0to1
-description: 从 0 到 1 的完整产品设计流程，结合顶级 UI/UX 设计原则、SKILL 工具链协作、移动端适配、性能优化、3D/WebGL 项目架构。适用于需要完整产品设计和实现的项目。
-version: 1.1.0
-tags: [product-design, uiux, mobile-first, performance, skill-chain, 3d-webgl, scientific-visualization]
+description: |
+  从 0 到 1 的完整产品设计流程，结合顶级 UI/UX 设计原则和 SKILL 工具链协作。
+  当用户需要创建新产品、优化现有产品、或进行产品设计决策时使用此技能。
+  支持：需求分析、UI/UX 设计、技术实现、移动端适配、性能优化、测试发布。
+version: 2.0.0
+tags: [product-design, uiux, mobile-first, performance, skill-chain, 3d-webgl]
 ---
 
-# 从 0 到 1 的完整产品设计流程
+# 产品设计 0 到 1 SKILL
 
-## 概述
+## 快速开始
 
-本 SKILL 定义了一套完整的产品设计和实现流程，从需求分析到最终发布，结合顶级 UI/UX 设计原则和 TRAE SKILL 工具链协作。适用于需要完整产品设计和实现的项目。
+1. 确定当前阶段：需求分析 / UI 设计 / 技术实现 / 移动端适配 / 测试发布
+2. 按需加载对应资源文件
+3. 使用斜杠命令快速执行常用任务
 
 ## 核心原则
 
-1. **移动优先**：所有设计决策优先考虑移动端体验
-2. **性能至上**：每个技术选型都要考虑性能影响
-3. **用户中心**：所有功能围绕用户实际需求设计
-4. **渐进增强**：基础功能优先，高级功能逐步添加
-5. **可维护性**：代码结构清晰，便于后续迭代
+1. **移动优先** - 所有设计优先考虑移动端
+2. **性能至上** - 每个技术选型考虑性能影响
+3. **用户中心** - 功能围绕实际需求设计
+4. **渐进增强** - 基础功能优先，高级功能逐步添加
+5. **可维护性** - 代码结构清晰，便于迭代
 
 ## 完整流程
 
 ### 阶段 1：需求分析与设计
 
-**目标**：明确产品定位、核心功能、目标用户
-
-**使用工具**：
-- `brainstorming`：头脑风暴，探索产品方向和核心功能
-- `writing-plans`：制定详细实现计划
+**使用工具**：`brainstorming`、`writing-plans`
 
 **关键步骤**：
+1. 产品定位（解决什么问题？目标用户？）
+2. 功能规划（MVP、优先级、依赖关系）
+3. 信息架构（页面结构、导航逻辑）
+4. 交互设计（用户流程、关键场景）
 
-1. **产品定位**
-   - 解决什么问题？
-   - 目标用户是谁？
-   - 核心价值主张是什么？
+**输出**：PRD、功能清单、信息架构图
 
-2. **功能规划**
-   - 核心功能列表（MVP）
-   - 功能优先级排序
-   - 功能间的依赖关系
-
-3. **信息架构**
-   - 页面结构
-   - 导航逻辑
-   - 数据流向
-
-4. **交互设计**
-   - 用户流程图
-   - 关键交互场景
-   - 异常处理流程
-
-**输出**：
-- 产品需求文档（PRD）
-- 功能清单
-- 信息架构图
-- 交互流程图
-
-**参考案例**：
-- [沉思工具设计文档](./examples/contemplation-design.md)：从 4 个主题扩展到 10 个主题的完整设计过程
+**参考**：[examples/contemplation-design.md](./examples/contemplation-design.md)
 
 ---
 
 ### 阶段 2：UI/UX 设计
 
-**目标**：创建符合顶级标准的用户界面和交互体验
+**使用工具**：`frontend-design`、`frontend-skill`、`theme-factory`
 
 **设计原则**：
+- 视觉层次（字体、颜色、间距）
+- 一致性（颜色、字体、间距、圆角系统）
+- 反馈机制（加载状态、错误提示）
+- 可访问性（对比度、键盘导航、屏幕阅读器）
+- 情感化设计（微交互、动画）
 
-1. **视觉层次**
-   - 使用字体大小、颜色、间距建立清晰的视觉层次
-   - 重要信息突出显示，次要信息适当弱化
-   - 避免视觉噪音，保持界面简洁
+**移动端要点**：
+- 触摸友好（≥44x44px）
+- 安全区域（`env(safe-area-inset-*)`）
+- 视口适配（`dvh` 替代 `vh`）
 
-2. **一致性**
-   - 颜色系统统一（主色、辅色、强调色）
-   - 字体系统统一（标题、正文、辅助文字）
-   - 间距系统统一（4px、8px、16px、24px、32px、48px、64px）
-   - 圆角系统统一（4px、8px、12px、16px、24px）
-
-3. **反馈机制**
-   - 每个用户操作都有即时反馈
-   - 加载状态明确（骨架屏、进度条、加载动画）
-   - 错误提示友好（明确的错误信息、可操作的解决方案）
-
-4. **可访问性**
-   - 颜色对比度符合 WCAG 标准
-   - 支持键盘导航
-   - 支持屏幕阅读器
-   - 提供高对比度模式、大字体模式、减少动画模式
-
-5. **情感化设计**
-   - 微交互提升体验（按钮悬停、点击反馈）
-   - 适当的动画效果（过渡、加载、成功）
-   - 个性化元素（用户头像、自定义主题）
-
-**移动端设计要点**：
-
-1. **触摸友好**
-   - 点击区域最小 44x44px
-   - 避免误触设计（按钮间距、边缘留白）
-   - 手势支持（滑动、长按、双击）
-
-2. **安全区域**
-   - 适配刘海屏、灵动岛
-   - 底部导航栏避开 Home Indicator
-   - 使用 `env(safe-area-inset-*)` 处理
-
-3. **视口适配**
-   - 使用 `dvh` 替代 `vh`，避免地址栏影响
-   - 响应式布局（flex、grid）
-   - 断点设计（320px、375px、414px、768px、1024px）
-
-4. **性能优化**
-   - 图片懒加载
-   - 虚拟滚动（长列表）
-   - 防抖节流（滚动、输入）
-
-**使用工具**：
-- `frontend-design`：创建高质量的前端界面
-- `frontend-skill`：前端设计最佳实践
-- `theme-factory`：主题系统管理
-
-**输出**：
-- UI 设计稿
-- 交互原型
-- 设计规范文档
-- 组件库
-
-**参考案例**：
-- [语录卡片设计](./examples/quote-card-design.md)：毛玻璃效果、左右箭头、折叠展开
-- [主题切换器设计](./examples/theme-switcher-design.md)：左侧纵向布局、避开无障碍按钮
+**参考**：[pitfalls/mobile-layout.md](./pitfalls/mobile-layout.md)
 
 ---
 
 ### 阶段 3：技术实现
 
-**目标**：将设计转化为可运行的代码
+**使用工具**：`test-driven-development`、`executing-plans`
 
-**技术栈选择原则**：
+**技术栈选择**：
+- 轻量优先（OGL > Three.js，Zustand > Redux）
+- 生态成熟（社区活跃、TypeScript 支持）
+- 性能导向
 
-1. **轻量优先**
-   - 选择体积小、性能好的库
-   - 避免过度依赖大型框架
-   - 按需加载，减少首屏体积
-
-2. **生态成熟**
-   - 选择社区活跃、维护良好的库
-   - 优先选择有 TypeScript 支持的库
-   - 考虑长期维护和升级
-
-3. **性能导向**
-   - WebGL 效果选择 OGL（比 Three.js 轻量）
-   - 状态管理选择 Zustand（比 Redux 轻量）
-   - 样式方案选择 Tailwind CSS（原子化，体积小）
-
-**代码分割策略**：
-
+**代码分割**：
 ```typescript
-// vite.config.ts
 build: {
   rollupOptions: {
     output: {
@@ -169,365 +83,162 @@ build: {
       },
     },
   },
-},
+}
 ```
 
-**动态导入**：
+**3D/WebGL 项目**：
+- Canvas 生命周期：始终挂载，用 opacity 切换可见性
+- z-index 层级：Canvas(z-0) < InfoPanel(z-20) < ControlPanel(z-30) < Navbar(z-50)
+- 粒子系统：按物理过程分层，使用 AdditiveBlending
+- 响应式布局：PC/移动端完全分离，三重设备检测
 
-```typescript
-// 工具组件按需加载
-const Contemplation = lazy(() => import('../components/tools/Contemplation'));
-const Divination = lazy(() => import('../components/tools/Divination'));
-
-<Suspense fallback={<LoadingFallback />}>
-  <Contemplation onBack={handleBack} />
-</Suspense>
-```
-
-**WebGL 效果适配**：
-
-从 [reactbits.dev](https://www.reactbits.dev) 获取 WebGL 效果组件后，需要进行移动端适配：
-
-1. **UV 归一化**：使用 `gl_FragCoord` 替代 `vUv`
-2. **分辨率传递**：使用设备像素而非 CSS 像素
-3. **缩放控制**：添加 `uScale` uniform 控制整体缩放
-4. **容器适配**：移除 `100vmax` 强制正方形容器
-
-**详细踩坑记录**：[WebGL 移动端适配踩坑](./pitfalls/webgl-mobile-adaptation.md)
-
-**3D/WebGL 项目架构**（Three.js / R3F 项目）：
-
-当项目涉及 3D 场景、粒子系统、科学可视化时，需要额外考虑：
-
-1. **Canvas 生命周期管理**
-   - Canvas 必须始终挂载，不能随路由/Tab 切换卸载
-   - 使用 `opacity + pointerEvents` 切换可见性，而非条件渲染
-   - AnimatePresence 卸载 Canvas 会导致 WebGL 上下文丢失
-
-2. **z-index 层级地狱**
-   - 3D Canvas 固定底层（z-0），UI 面板浮于上层（z-20+）
-   - 多个浮动面板之间需要明确层级关系（控制板 z-30 > 信息面板 z-20）
-   - 避免使用 `absolute` 定位面板，改用 `fixed` 避免滚动影响
-
-3. **粒子系统科学分层**
-   - 按物理过程分层：快中子、热中子、裂变碎片、伽马光子、切伦科夫辐射
-   - 每层独立控制粒子数量、颜色、运动方式
-   - 使用 `AdditiveBlending` 实现发光叠加效果
-   - 粒子总数建议：背景 3000+ / 动态粒子 5000+
-
-4. **响应式 3D 场景**
-   - PC 端：左右面板 + 中央 3D 场景
-   - 移动端：底部弹出面板 + 全屏 3D 场景
-   - 设备检测：User Agent + 屏幕宽度 + 触摸能力三重判断
-   - 支持手动切换 PC/Mobile 模式并持久化
-
-5. **科学可视化参数**
-   - 基于真实物理数据设定参数范围（如 PWR：325°C、15.5MPa）
-   - 启动过程分阶段：预热→升压→临界→稳定运行
-   - 颜色随状态变化：温度低→蓝，温度高→红
-
-**详细踩坑记录**：[3D/WebGL 架构踩坑](./pitfalls/3d-webgl-architecture.md)
-
-**使用工具**：
-- `test-driven-development`：测试驱动开发
-- `executing-plans`：执行实现计划
-
-**输出**：
-- 可运行的代码
-- 单元测试
-- 性能测试报告
+**参考**：[pitfalls/3d-webgl-architecture.md](./pitfalls/3d-webgl-architecture.md)
 
 ---
 
-### 阶段 4：移动端适配与优化
+### 阶段 4：移动端适配
 
-**目标**：确保在所有移动设备上都有良好体验
+**使用工具**：`dogfood`
 
 **适配清单**：
+- [ ] `100dvh` 替代 `100vh`
+- [ ] `env(safe-area-inset-*)` 处理安全区域
+- [ ] 触摸区域 ≥44x44px
+- [ ] 无横向溢出
+- [ ] 折叠按钮明显且易用
 
-1. **视口适配**
-   - [ ] 使用 `100dvh` 替代 `100vh`
-   - [ ] 使用 `env(safe-area-inset-*)` 处理安全区域
-   - [ ] 底部按钮避开固定导航栏
-
-2. **布局适配**
-   - [ ] 主题切换器放在左侧，避开右侧无障碍按钮
-   - [ ] 顶部控制栏居中，避免与侧边栏冲突
-   - [ ] 滚动容器不使用 `transform` 动画
-
-3. **性能优化**
-   - [ ] 代码分割，主包 < 500KB
-   - [ ] 图片懒加载
-   - [ ] 虚拟滚动（长列表）
-   - [ ] 防抖节流
-
-4. **交互优化**
-   - [ ] 触摸反馈（点击、滑动、长按）
-   - [ ] 手势支持（左右滑动切换）
-   - [ ] 新手引导（首次访问）
-
-**详细踩坑记录**：[移动端布局踩坑](./pitfalls/mobile-layout.md)
-
-**使用工具**：
-- `dogfood`：探索性测试，发现 UX 问题
-
-**输出**：
-- 移动端适配报告
-- 性能优化报告
-- 测试报告
+**参考**：[pitfalls/mobile-layout.md](./pitfalls/mobile-layout.md)
 
 ---
 
-### 阶段 5：测试与发布
+### 阶段 5：性能优化
 
-**目标**：确保产品质量，顺利发布
+**目标**：
+- 主包 < 500KB
+- 首屏 < 3s
+- Lighthouse > 90
+
+**策略**：
+- 动态导入 + Vite 分包
+- 图片懒加载 + WebP
+- 虚拟滚动（长列表）
+- 防抖节流
+
+**参考**：[pitfalls/performance.md](./pitfalls/performance.md)
+
+---
+
+### 阶段 6：测试与发布
 
 **测试清单**：
-
-1. **功能测试**
-   - [ ] 核心功能正常
-   - [ ] 边界情况处理
-   - [ ] 错误提示友好
-
-2. **兼容性测试**
-   - [ ] iOS Safari
-   - [ ] Android Chrome
-   - [ ] 微信内置浏览器
-   - [ ] 不同屏幕尺寸
-
-3. **性能测试**
-   - [ ] 首屏加载时间 < 3s
-   - [ ] 交互响应时间 < 100ms
-   - [ ] 内存占用合理
-
-4. **可访问性测试**
-   - [ ] 键盘导航
-   - [ ] 屏幕阅读器
-   - [ ] 高对比度模式
+- [ ] 功能测试（核心功能、边界情况）
+- [ ] 兼容性测试（iOS Safari、Android Chrome、微信浏览器）
+- [ ] 性能测试（首屏 < 3s、交互 < 100ms）
+- [ ] 可访问性测试（键盘导航、屏幕阅读器）
 
 **发布流程**：
-
-1. **代码审查**
-   - 代码质量检查
-   - 性能检查
-   - 安全检查
-
-2. **构建部署**
-   ```bash
-   npm run build
-   git add -A
-   git commit -m "feat: 完成功能 X"
-   git push origin main
-   ```
-
-3. **Vercel 自动部署**
-   - 配置 `vercel.json` 支持 SPA 路由
-   - 自动构建和部署
-   - 生成预览链接
-
-4. **发布后验证**
-   - 访问生产环境
-   - 验证核心功能
-   - 监控错误日志
-
-**使用工具**：
-- `dogfood`：发布前最终测试
-
-**输出**：
-- 测试报告
-- 发布清单
-- 监控报告
+```bash
+npm run build
+git add -A
+git commit -m "feat: 完成功能 X"
+git push origin main
+```
 
 ---
 
-## SKILL 工具链
+## 斜杠命令
 
-### 设计阶段
+使用 `/` 前缀快速执行常用任务：
 
-| 工具 | 用途 | 使用时机 |
-|------|------|----------|
-| `brainstorming` | 头脑风暴，探索产品方向 | 项目启动时 |
-| `writing-plans` | 制定详细实现计划 | 需求明确后 |
-| `frontend-design` | 创建高质量前端界面 | UI 设计时 |
-| `theme-factory` | 主题系统管理 | 需要多主题时 |
+- `/brainstorm` - 启动需求头脑风暴
+- `/plan` - 生成实现计划
+- `/build` - 执行构建流程
+- `/extract-experience` - 从当前项目提取经验到 SKILL
+- `/generate-docs` - 生成产品文档和介绍
 
-### 实现阶段
-
-| 工具 | 用途 | 使用时机 |
-|------|------|----------|
-| `test-driven-development` | 测试驱动开发 | 编写代码时 |
-| `executing-plans` | 执行实现计划 | 按计划实现时 |
-| `algorithmic-art` | 算法艺术生成 | 需要生成艺术效果时 |
-
-### 测试阶段
-
-| 工具 | 用途 | 使用时机 |
-|------|------|----------|
-| `dogfood` | 探索性测试 | 发布前测试 |
-
-### 优化阶段
-
-| 工具 | 用途 | 使用时机 |
-|------|------|----------|
-| `consulting-analysis` | 数据分析和报告 | 需要性能分析时 |
+详见 [commands/](./commands/) 目录
 
 ---
 
-## 外部资源
+## 工具链
 
-### 设计资源
-
-- [reactbits.dev](https://www.reactbits.dev)：React 组件库，包含 WebGL 效果
-- [The Book of Shaders](https://thebookofshaders.com/)：Shader 学习资源
-- [OGL 文档](https://github.com/oframe/ogl)：轻量级 WebGL 库
-
-### 技术资源
-
-- [React 文档](https://react.dev/)：React 官方文档
-- [Vite 文档](https://vitejs.dev/)：Vite 构建工具
-- [Tailwind CSS](https://tailwindcss.com/)：原子化 CSS 框架
+| 阶段 | 工具 | 用途 |
+|------|------|------|
+| 需求 | `brainstorming` | 探索产品方向 |
+| 计划 | `writing-plans` | 制定实现计划 |
+| UI | `frontend-design` | 创建前端界面 |
+| 主题 | `theme-factory` | 多主题管理 |
+| 测试 | `test-driven-development` | TDD 开发 |
+| 执行 | `executing-plans` | 按计划实现 |
+| 验证 | `dogfood` | 探索性测试 |
 
 ---
 
-## 踩坑记录索引
+## 踩坑记录
 
-详细的踩坑记录和解决方案，请参考：
-
-1. [WebGL 移动端适配踩坑](./pitfalls/webgl-mobile-adaptation.md)
-   - Shader 过度放大问题
-   - UV 归一化方案
-   - 分辨率传递问题
-
-2. [移动端布局踩坑](./pitfalls/mobile-layout.md)
-   - 安全区域适配
-   - 固定导航栏遮挡
-   - 主题切换器位置冲突
-   - CSS 动画重置滚动位置
-   - PC端折叠按钮设计（新增）
-   - z-index 层级地狱（新增）
-
-3. [性能优化踩坑](./pitfalls/performance.md)
-   - 代码分割策略
-   - 主包体积优化
-   - 动态导入最佳实践
-
-4. [交互设计踩坑](./pitfalls/interaction.md)
-   - 触摸反馈设计
-   - 手势支持
-   - 新手引导设计
-
-5. [3D/WebGL 架构踩坑](./pitfalls/3d-webgl-architecture.md)（新增）
-   - Canvas 生命周期管理（AnimatePresence 导致 WebGL 上下文丢失）
-   - z-index 层级地狱（多面板重叠问题）
-   - 粒子系统性能优化（科学分层设计）
-   - 响应式 3D 场景布局（PC/移动端分离）
-   - 科学可视化参数校准（基于真实物理数据）
+1. [WebGL 移动端适配](./pitfalls/webgl-mobile-adaptation.md) - Shader 放大、UV 归一化
+2. [移动端布局](./pitfalls/mobile-layout.md) - 安全区域、折叠按钮、z-index
+3. [性能优化](./pitfalls/performance.md) - 代码分割、主包优化
+4. [交互设计](./pitfalls/interaction.md) - 触摸反馈、手势支持
+5. [3D/WebGL 架构](./pitfalls/3d-webgl-architecture.md) - Canvas 生命周期、粒子分层
 
 ---
 
 ## 实际案例
 
-### 案例 1：沉思工具从 0 到 1
+1. **沉思工具** - 沉浸式语录浏览，10 主题，主包优化 49%
+   - [详细文档](./examples/contemplation-design.md)
 
-**项目背景**：创建一个沉浸式语录浏览工具，支持多主题切换和 WebGL 效果
+2. **抽签工具** - 移动端 UX 优化，解决按钮遮挡
+   - [详细文档](./examples/divination-optimization.md)
 
-**设计过程**：
-1. 使用 `brainstorming` 探索产品方向
-2. 使用 `writing-plans` 制定实现计划
-3. 从 reactbits.dev 获取 4 个 WebGL 效果组件
-4. 扩展至 10 个主题，每个主题 10 条语录
-5. 设计语录卡片交互（点击、箭头、滑动）
-6. 移动端适配（安全区域、布局优化）
-7. 性能优化（代码分割，主包从 1018KB 降至 519KB）
+3. **核反应堆模拟器** - 3D 教育可视化，10500+ 粒子，科学参数
+   - [详细文档](./examples/nuclear-reactor-design.md)
 
-**关键决策**：
-- 选择 OGL 而非 Three.js（体积更小）
-- 使用 Zustand 而非 Redux（更轻量）
-- 主题切换器放在左侧（避开右侧无障碍按钮）
-- 语录卡片支持三种交互方式（点击、箭头、滑动）
+---
 
-**详细文档**：[沉思工具设计文档](./examples/contemplation-design.md)
+## 维护规则
 
-### 案例 2：抽签工具优化
+新项目完成后，使用 `/extract-experience` 命令提取经验：
 
-**项目背景**：优化抽签工具的用户体验，解决底部按钮被遮挡问题
+1. 识别踩过的坑 → 添加到对应 `pitfalls/` 文件
+2. 总结关键决策 → 添加到 `examples/` 目录
+3. 更新 SKILL.md 索引 → 保持文档同步
 
-**问题**：底部"再抽一签"按钮被固定导航栏遮挡
-
-**解决方案**：
-```typescript
-<div style={{ marginBottom: 'calc(64px + env(safe-area-inset-bottom))' }}>
-```
-
-**详细文档**：[抽签工具优化文档](./examples/divination-optimization.md)
-
-### 案例 3：核反应堆模拟器从 0 到 1
-
-**项目背景**：创建高质量 3D 交互式核反应堆网页，用于教育目的
-
-**设计过程**：
-1. 使用 `brainstorming` 探索产品方向（教育可视化）
-2. 技术选型：R3F + Three.js + @react-three/postprocessing
-3. 建立明确 z-index 层级体系（Canvas z-0 < InfoPanel z-20 < ControlPanel z-30 < Navbar z-50）
-4. Tab 切换架构解决面板重叠问题（10+ 次修复失败后重构）
-5. 三重设备检测 + 手动切换 PC/Mobile 模式
-6. 粒子系统科学分层（10500+ 粒子，按物理过程分 7 层）
-7. 基于真实 PWR 参数校准（325°C、15.5MPa、1e14 n/cm²·s）
-8. 启动过程分阶段（预热→升压→临界→稳定运行）
-9. PC端/移动端折叠按钮设计
-10. 单文件打包 + 多平台部署（axureshow/BytePlus）
-
-**关键决策**：
-- 选择 R3F + Three.js（生态成熟，后处理丰富）
-- Canvas 始终挂载，用 opacity 切换可见性（避免 WebGL 上下文丢失）
-- 粒子按物理过程分层（快中子、热中子、裂变碎片、伽马光子、切伦科夫辐射）
-- PC/移动端完全分离布局（而非响应式适配）
-- 使用 `fixed` 替代 `absolute` 避免滚动影响
-
-**核心成果**：
-- 粒子总数：2800 → 10500+
-- 科学准确性：基于真实压水堆物理参数
-- 响应式：三重设备检测 + 手动切换
-- 部署灵活：单文件打包，支持多种部署方式
-
-**详细文档**：[核反应堆模拟器设计文档](./examples/nuclear-reactor-design.md)
+详见 [MAINTENANCE.md](./MAINTENANCE.md)
 
 ---
 
 ## 检查清单
 
 ### 设计阶段
-
 - [ ] 产品定位明确
 - [ ] 核心功能清晰
 - [ ] 信息架构合理
 - [ ] 交互流程顺畅
-- [ ] 设计规范完整
 
 ### 实现阶段
-
 - [ ] 代码结构清晰
 - [ ] 性能考虑充分
 - [ ] 测试覆盖完整
-- [ ] 文档齐全
 
 ### 发布阶段
-
 - [ ] 功能测试通过
 - [ ] 兼容性测试通过
 - [ ] 性能测试通过
-- [ ] 可访问性测试通过
 - [ ] 生产环境验证通过
 
 ---
 
-## 总结
+## 外部资源
 
-本 SKILL 提供了一套完整的从 0 到 1 产品设计流程，涵盖需求分析、UI/UX 设计、技术实现、移动端适配、测试发布等各个阶段。结合顶级 UI/UX 设计原则和 TRAE SKILL 工具链，帮助你高效地完成产品设计和实现。
+### 设计
+- [reactbits.dev](https://www.reactbits.dev) - React 组件库
+- [The Book of Shaders](https://thebookofshaders.com/) - Shader 学习
+- [OGL 文档](https://github.com/oframe/ogl) - 轻量 WebGL
 
-关键要点：
-1. **移动优先**：所有设计决策优先考虑移动端
-2. **性能至上**：每个技术选型都要考虑性能影响
-3. **工具协作**：充分利用 SKILL 工具链提高效率
-4. **踩坑记录**：详细记录踩过的坑，避免重复犯错
-5. **持续优化**：发布后持续监控和优化
+### 技术
+- [React](https://react.dev/) - 官方文档
+- [Vite](https://vitejs.dev/) - 构建工具
+- [Tailwind CSS](https://tailwindcss.com/) - 原子化 CSS
+- [React Three Fiber](https://docs.pmnd.rs/react-three-fiber) - R3F 文档

@@ -10,6 +10,8 @@
 
 - **完整流程**：6 个阶段覆盖产品设计全生命周期
 - **工具链协作**：brainstorming → writing-plans → frontend-design → test-driven-development → executing-plans → dogfood
+- **斜杠命令**：快速执行常用任务（`/brainstorm`、`/extract-experience`、`/generate-docs`）
+- **输出模板**：标准化的踩坑记录和项目案例格式
 - **移动优先**：所有设计决策优先考虑移动端体验
 - **性能至上**：每个技术选型都考虑性能影响
 - **实战经验**：3 个真实项目案例 + 5 份详细踩坑记录
@@ -18,7 +20,16 @@
 
 ```
 contemplation-skill/
-├── SKILL.md                          # 主技能文档（核心方法论）
+├── SKILL.md                          # 主技能文档（核心方法论，< 250 行）
+├── MAINTENANCE.md                    # 维护规则（多项目经验积累）
+├── README.md                         # 本文件
+├── commands/                         # 斜杠命令
+│   ├── README.md                     # 命令索引
+│   ├── extract-experience.md         # 经验提取命令
+│   └── generate-docs.md              # 文档生成命令
+├── templates/                        # 输出模板
+│   ├── pitfall.md                    # 踩坑记录模板
+│   └── project-example.md            # 项目案例模板
 ├── examples/                         # 实战案例
 │   ├── contemplation-design.md       # 沉思工具设计案例
 │   ├── divination-optimization.md    # 抽签工具优化案例
@@ -37,7 +48,19 @@ contemplation-skill/
 
 将 `SKILL.md` 文件添加到你的 TRAE IDE 的 skills 目录中。
 
-### 2. 使用流程
+### 2. 使用斜杠命令
+
+本 SKILL 提供多个斜杠命令快速执行常用任务：
+
+- `/brainstorm` - 启动需求头脑风暴
+- `/plan` - 生成实现计划
+- `/build` - 执行构建流程
+- `/extract-experience` - 从当前项目提取经验到 SKILL
+- `/generate-docs` - 生成产品文档和介绍
+
+详细命令说明见 [commands/README.md](./commands/README.md)
+
+### 3. 使用流程
 
 按照 SKILL.md 中的 6 个阶段顺序执行：
 
@@ -48,7 +71,7 @@ contemplation-skill/
 5. **性能优化** - 参考 `pitfalls/performance.md`
 6. **测试与发布** - 使用 `dogfood` 进行最终测试
 
-### 3. 查阅踩坑记录
+### 4. 查阅踩坑记录
 
 在开发过程中遇到问题时，查阅对应的 pitfalls 文档：
 
@@ -57,6 +80,16 @@ contemplation-skill/
 - 性能问题 → `pitfalls/performance.md`
 - 交互问题 → `pitfalls/interaction.md`
 - 3D 架构问题 → `pitfalls/3d-webgl-architecture.md`
+
+### 5. 提取项目经验
+
+项目完成后，使用 `/extract-experience` 命令自动提取经验：
+
+1. 识别踩过的坑 → 添加到对应 `pitfalls/` 文件
+2. 总结关键决策 → 添加到 `examples/` 目录
+3. 更新 SKILL.md 索引 → 保持文档同步
+
+详细维护规则见 [MAINTENANCE.md](./MAINTENANCE.md)
 
 ## 📋 核心原则
 
