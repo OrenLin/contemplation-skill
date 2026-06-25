@@ -1,0 +1,28 @@
+{
+  "name": "contemplation-skill",
+  "version": "1.0.0",
+  "description": "沉思工具优化 SKILL - WebGL 特效适配、移动端布局、性能优化完整指南",
+  "main": "README.md",
+  "scripts": {
+    "test": "echo \"No tests specified\""
+  },
+  "keywords": [
+    "webgl",
+    "ogl",
+    "react",
+    "mobile-optimization",
+    "shader",
+    "code-splitting",
+    "performance"
+  ],
+  "author": "OrenLin",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OrenLin/contemplation-skill.git"
+  },
+  "bugs": {
+    "url": "https://github.com/OrenLin/contemplation-skill/issues"
+  },
+  "homepage": "https://github.com/OrenLin/contemplation-skill#readme"
+}
