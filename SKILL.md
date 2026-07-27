@@ -4,7 +4,7 @@ description: |
   从 0 到 1 的完整产品设计流程，结合顶级 UI/UX 设计原则和 SKILL 工具链协作。
   当用户需要创建新产品、优化现有产品、或进行产品设计决策时使用此技能。
   支持：需求分析、UI/UX 设计、技术实现、移动端适配、性能优化、测试发布。
-version: 2.1.0
+version: 2.2.0
 tags: [product-design, uiux, mobile-first, performance, skill-chain, 3d-webgl, math-optimization]
 ---
 
@@ -91,6 +91,10 @@ build: {
 - z-index 层级：Canvas(z-0) < InfoPanel(z-20) < ControlPanel(z-30) < Navbar(z-50)
 - 粒子系统：按物理过程分层，使用 AdditiveBlending
 - 响应式布局：PC/移动端完全分离，三重设备检测
+- Three.js 版本：必须锁定具体版本号（推荐 r170），禁止使用 `@latest`
+- 后处理链：EffectComposer 必须以 OutputPass 结尾
+- 中文标注：使用 CSS2DRenderer + HTML 标签，禁用 TextGeometry
+- 重复结构：使用 InstancedMesh 单 draw call 渲染
 
 **参考**：[pitfalls/3d-webgl-architecture.md](./pitfalls/3d-webgl-architecture.md)
 
@@ -106,6 +110,8 @@ build: {
 - [ ] 触摸区域 ≥44x44px
 - [ ] 无横向溢出
 - [ ] 折叠按钮明显且易用
+- [ ] 3D 场景使用底部抽屉式控制台
+- [ ] 相机 maxPolarAngle 约束防止穿地
 
 **参考**：[pitfalls/mobile-layout.md](./pitfalls/mobile-layout.md)
 
@@ -123,6 +129,9 @@ build: {
 - 图片懒加载 + WebP
 - 虚拟滚动（长列表）
 - 防抖节流
+- 三档画质分级（低/中/高），移动端默认低
+- 物理模拟固定 30Hz 步进
+- 粒子使用预分配对象池 + 隔帧更新
 
 **参考**：[pitfalls/performance.md](./pitfalls/performance.md)
 
@@ -177,10 +186,10 @@ git push origin main
 ## 踩坑记录
 
 1. [WebGL 移动端适配](./pitfalls/webgl-mobile-adaptation.md) - Shader 放大、UV 归一化
-2. [移动端布局](./pitfalls/mobile-layout.md) - 安全区域、折叠按钮、z-index
-3. [性能优化](./pitfalls/performance.md) - 代码分割、主包优化
+2. [移动端布局](./pitfalls/mobile-layout.md) - 安全区域、折叠按钮、z-index、3D 控制台、相机约束
+3. [性能优化](./pitfalls/performance.md) - 代码分割、主包优化、画质分级、固定步进、粒子池
 4. [交互设计](./pitfalls/interaction.md) - 触摸反馈、手势支持
-5. [3D/WebGL 架构](./pitfalls/3d-webgl-architecture.md) - Canvas 生命周期、粒子分层
+5. [3D/WebGL 架构](./pitfalls/3d-webgl-architecture.md) - Canvas 生命周期、粒子分层、版本锁定、后处理、InstancedMesh
 6. [数学优化推理](./pitfalls/math-optimization-reasoning.md) - 常数项倍乘、临界点跨越、枚举与构造脱节、多角度验证
 
 ---
@@ -193,7 +202,7 @@ git push origin main
 2. **抽签工具** - 移动端 UX 优化，解决按钮遮挡
    - [详细文档](./examples/divination-optimization.md)
 
-3. **核反应堆模拟器** - 3D 教育可视化，10500+ 粒子，科学参数
+3. **核反应堆模拟器** - 3D 教育可视化，末日废土风格，三档画质，移动端 60FPS
    - [详细文档](./examples/nuclear-reactor-design.md)
 
 4. **分段线性函数优化分配** - 分段函数最小化，排名约束，两阶段枚举+构造

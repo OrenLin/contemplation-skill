@@ -354,6 +354,126 @@ z-50: 顶部导航栏（最高层）
 
 ---
 
+## 问题 10：3D 场景移动端控制台遮挡问题
+
+### 症状
+- 移动端控制面板遮挡 3D 场景
+- 传统侧边面板在竖屏下无法使用
+- 用户难以同时操作面板和观察场景
+
+### 根本原因
+1. PC 端左右面板布局直接搬到移动端
+2. 竖屏屏幕宽度有限
+3. 3D 场景需要全屏展示
+
+### 解决方案
+底部抽屉式控制台 + 顶部设置按钮：
+
+```html
+<!-- 顶部右侧设置按钮 -->
+<button id="settings-btn" style="
+  position: fixed;
+  top: calc(12px + env(safe-area-inset-top));
+  right: 12px;
+  z-index: 50;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(20,15,10,0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,170,80,0.3);
+">⚙</button>
+
+<!-- 底部抽屉控制台 -->
+<div id="drawer" style="
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  transform: translateY(calc(100% - 56px));
+  transition: transform 0.3s ease;
+  background: rgba(20,15,10,0.92);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255,170,80,0.2);
+  padding-bottom: env(safe-area-inset-bottom);
+">
+  <!-- 抽屉手柄 -->
+  <div id="drawer-handle" style="
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  ">
+    <div style="width: 40px; height: 4px; border-radius: 2px; background: rgba(255,170,80,0.5);"></div>
+  </div>
+  <!-- 控制内容 -->
+  <div style="padding: 0 16px 16px;">
+    <!-- 滑块、按钮等 -->
+  </div>
+</div>
+
+<script>
+const drawer = document.getElementById('drawer');
+let drawerOpen = false;
+
+document.getElementById('drawer-handle').onclick = () => {
+  drawerOpen = !drawerOpen;
+  drawer.style.transform = drawerOpen 
+    ? 'translateY(0)' 
+    : 'translateY(calc(100% - 56px))';
+};
+</script>
+```
+
+### 验证清单
+- [ ] 控制台默认收起，仅露手柄
+- [ ] 展开后不遮挡 3D 场景上半部分
+- [ ] 手柄触摸区域 ≥ 44px
+- [ ] 适配底部安全区域
+
+---
+
+## 问题 11：3D 相机穿地导致体验崩坏
+
+### 症状
+- 用户可以旋转相机到地面以下
+- 看到地面背面的渲染异常
+- 场景沉浸感被破坏
+
+### 根本原因
+1. OrbitControls 默认允许全角度旋转
+2. 未设置 maxPolarAngle 约束
+3. 完全锁定又影响用户体验
+
+### 解决方案
+允许略低于水平线但禁止穿地：
+
+```js
+const controls = new OrbitControls(camera, renderer.domElement);
+
+// ✅ 允许略低于水平线（增强张力），但禁止穿地
+controls.maxPolarAngle = Math.PI / 2 + 0.12;  // 约 6.9° 低于水平
+
+// 其他触控优化
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.minDistance = 5;
+controls.maxDistance = 50;
+controls.touches = {
+  ONE: THREE.TOUCH.ROTATE,
+  TWO: THREE.TOUCH.DOLLY_PAN
+};
+```
+
+### 验证清单
+- [ ] 相机无法旋转到地面以下
+- [ ] 仍可略微俯视增强视觉张力
+- [ ] 触控操作流畅（单指旋转、双指缩放）
+
+---
+
 ## 验证清单
 
 - [ ] 底部按钮避开固定导航栏（使用 `marginBottom`）
@@ -367,6 +487,8 @@ z-50: 顶部导航栏（最高层）
 - [ ] 移动端折叠提示按钮居中显示
 - [ ] 折叠/展开动画流畅
 - [ ] z-index 层级关系明确（Canvas < InfoPanel < ControlPanel < Navbar）
+- [ ] 3D 场景使用底部抽屉式控制台
+- [ ] 相机 maxPolarAngle 约束防止穿地
 - [ ] 在 iOS Safari、Android Chrome、微信浏览器中测试
 
 ---
@@ -377,3 +499,4 @@ z-50: 顶部导航栏（最高层）
 - [CSS Tricks: Safe Area Insets](https://css-tricks.com/the-notch-and-css/)
 - [Can I Use: dvh](https://caniuse.com/viewport-unit-variants)
 - [MDN: position: fixed](https://developer.mozilla.org/en-US/docs/Web/CSS/position#fixed)
+- [Three.js OrbitControls](https://threejs.org/docs/#examples/en/controls/OrbitControls)

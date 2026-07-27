@@ -387,6 +387,245 @@ const getTemperatureColor = (temp: number) => {
 
 ---
 
+## 问题 6：Three.js 版本不锁定导致 ESM 链路断裂
+
+### 症状
+- 使用 `three@latest` 或未指定版本的 CDN 链接
+- 某次 Three.js 升级后，importmap 导入的模块 API 变更
+- 控制台报错：`Uncaught TypeError: X is not a function` 或 `is not exported`
+
+### 根本原因
+1. Three.js 在小版本间也会重命名或移除内部 API
+2. examples/jsm 下的后处理模块路径与版本强绑定
+3. ESM importmap 写死了模块路径，版本漂移即断裂
+
+### 解决方案
+锁定到具体版本号，禁止使用 `latest`：
+
+```html
+<!-- ❌ 错误：使用 latest -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@latest/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@latest/examples/jsm/"
+  }
+}
+</script>
+
+<!-- ✅ 正确：锁定 r170 -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  }
+}
+</script>
+```
+
+### 验证清单
+- [ ] importmap 中所有 Three.js 引用使用同一具体版本号
+- [ ] 不使用 `@latest` 或无版本号
+- [ ] jsDelivr/unpkg 路径与版本号一致
+
+---
+
+## 问题 7：EffectComposer 遗漏 OutputPass 导致画面发暗
+
+### 症状
+- 使用 UnrealBloomPass 后整体画面偏暗、偏灰
+- 颜色饱和度丢失，高光区域过曝
+- 与预期色调差距明显
+
+### 根本原因
+1. UnrealBloomPass 在 HDR 线性空间工作
+2. 缺少 OutputPass 时，渲染管线未正确转换回 sRGB 输出空间
+3. 颜色管理（ColorManagement）未完成闭环
+
+### 解决方案
+后处理链必须包含 OutputPass 作为最后一步：
+
+```js
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+
+const bloomPass = new UnrealBloomPass(
+  new THREE.Vector2(window.innerWidth, window.innerHeight),
+  0.8,  // strength
+  0.4,  // radius
+  0.85  // threshold
+);
+composer.addPass(bloomPass);
+
+// ✅ 必须添加，不可省略
+composer.addPass(new OutputPass());
+```
+
+### 验证清单
+- [ ] 后处理链最后一步为 OutputPass
+- [ ] 画面亮度与未开 Bloom 时一致或略亮
+- [ ] 颜色无灰蒙感
+
+---
+
+## 问题 8：中文 3D 标注用 TextGeometry 失败
+
+### 症状
+- TextGeometry 渲染中文显示为方块或空白
+- 需要额外加载几 MB 的中文字体 JSON
+- 移动端加载缓慢
+
+### 根本原因
+1. TextGeometry 依赖 font JSON，中文字符集巨大，字体文件动辄数 MB
+2. Three.js 的 font loader 对 CJK 支持有限
+3. 性能与加载时间不可接受
+
+### 解决方案
+使用 CSS2DRenderer + HTML 标签替代：
+
+```js
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+// 创建标注
+const labelDiv = document.createElement('div');
+labelDiv.className = 'reactor-label';
+labelDiv.textContent = '压力容器';
+labelDiv.style.cssText = 'color:#ffcc88;font-size:12px;pointer-events:none;';
+
+const label = new CSS2DObject(labelDiv);
+label.position.set(0, 5, 0);
+scene.add(label);
+
+// 独立的 CSS2DRenderer
+const labelRenderer = new CSS2DRenderer();
+labelRenderer.setSize(window.innerWidth, window.innerHeight);
+labelRenderer.domElement.style.position = 'absolute';
+labelRenderer.domElement.style.top = '0';
+labelRenderer.domElement.style.pointerEvents = 'none';
+document.body.appendChild(labelRenderer.domElement);
+
+// 渲染循环中调用
+function animate() {
+  composer.render();
+  labelRenderer.render(scene, camera);
+}
+```
+
+### 验证清单
+- [ ] 中文标注正常显示，无方块
+- [ ] 标注跟随 3D 物体位置
+- [ ] 无额外大字体文件加载
+
+---
+
+## 问题 9：InstancedMesh 未用导致重复结构卡顿
+
+### 症状
+- 燃料棒、控制棒等数百个重复几何体使用独立 Mesh
+- draw call 数飙升，移动端帧率骤降
+- 内存占用高
+
+### 根本原因
+1. 每个 Mesh 独立提交 draw call
+2. 材质与几何体未共享
+3. GPU 无法批量渲染
+
+### 解决方案
+使用 InstancedMesh 单 draw call 渲染所有重复结构：
+
+```js
+const ROD_COUNT = 200;
+const rodGeo = new THREE.CylinderGeometry(0.1, 0.1, 3, 12);
+const rodMat = new THREE.MeshStandardMaterial({ color: 0x3a8a6a });
+const instancedRods = new THREE.InstancedMesh(rodGeo, rodMat, ROD_COUNT);
+
+const dummy = new THREE.Object3D();
+for (let i = 0; i < ROD_COUNT; i++) {
+  // 按环形布局
+  const angle = (i / ROD_COUNT) * Math.PI * 2;
+  const radius = 2.5;
+  dummy.position.set(
+    Math.cos(angle) * radius,
+    0,
+    Math.sin(angle) * radius
+  );
+  dummy.updateMatrix();
+  instancedRods.setMatrixAt(i, dummy.matrix);
+}
+scene.add(instancedRods);
+
+// ✅ 仅在位置变化时更新
+function updateControlRods(position) {
+  if (position !== lastPosition) {
+    for (let i = 0; i < ROD_COUNT; i++) {
+      dummy.position.y = position;
+      dummy.updateMatrix();
+      instancedRods.setMatrixAt(i, dummy.matrix);
+    }
+    instancedRods.instanceMatrix.needsUpdate = true;
+    lastPosition = position;
+  }
+}
+```
+
+### 验证清单
+- [ ] 重复结构使用 InstancedMesh
+- [ ] draw call 数显著下降
+- [ ] 矩阵仅在变化时更新
+
+---
+
+## 问题 10：变量初始化顺序导致 ReferenceError
+
+### 症状
+- 控制台报错：`ReferenceError: Cannot access 'X' before initialization`
+- 常见于 `let`/`const` 声明的变量在声明前被引用
+- 场景对象、UI 对象、配置常量最易出现
+
+### 根本原因
+1. Three.js 单文件项目中变量声明顺序随意
+2. 粒子系统、UI 控件在初始化时引用了尚未声明的场景对象
+3. ES 模块的 TDZ（暂时性死区）比 var 更严格
+
+### 解决方案
+提前声明关键变量，并在使用处加存在性保护：
+
+```js
+// ✅ 在文件顶部提前声明
+let scene, camera, renderer, composer;
+let reactorGroup, ui, neutronSystem;
+let PERF = { level: 0, neutronCount: 125 };
+
+function init() {
+  scene = new THREE.Scene();
+  // ...
+  reactorGroup = new THREE.Group();
+  scene.add(reactorGroup);
+}
+
+function initParticles() {
+  // ✅ 加存在性保护
+  if (!reactorGroup || !ui) {
+    requestAnimationFrame(initParticles);
+    return;
+  }
+  // ...
+}
+```
+
+### 验证清单
+- [ ] 关键对象在文件顶部声明
+- [ ] 异步初始化函数加存在性保护
+- [ ] 无 TDZ 相关的 ReferenceError
+
+---
+
 ## 验证清单
 
 - [ ] Canvas 始终挂载，不随 Tab 切换卸载
@@ -398,6 +637,11 @@ const getTemperatureColor = (temp: number) => {
 - [ ] 科学参数基于真实数据
 - [ ] 启动过程分阶段
 - [ ] 颜色随状态变化
+- [ ] importmap 中 Three.js 版本锁定
+- [ ] 后处理链包含 OutputPass
+- [ ] 中文标注使用 CSS2DRenderer
+- [ ] 重复结构使用 InstancedMesh
+- [ ] 变量初始化顺序正确，无 TDZ 错误
 - [ ] 在 iOS Safari、Android Chrome、微信浏览器中测试
 
 ---
@@ -406,5 +650,7 @@ const getTemperatureColor = (temp: number) => {
 
 - [React Three Fiber 文档](https://docs.pmnd.rs/react-three-fiber)
 - [Three.js 文档](https://threejs.org/docs/)
+- [Three.js r170 release notes](https://github.com/mrdoob/three.js/releases/tag/r170)
+- [EffectComposer 后处理](https://threejs.org/docs/#examples/en/postprocessing/EffectComposer)
 - [压水堆原理](https://zh.wikipedia.org/wiki/%E5%8E%8B%E6%B0%B4%E5%A0%86)
 - [核反应堆物理](https://en.wikipedia.org/wiki/Nuclear_reactor_physics)

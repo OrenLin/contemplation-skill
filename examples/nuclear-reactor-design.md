@@ -316,9 +316,84 @@ export default defineConfig({
 - **交互体验**：折叠按钮明显，提示清晰
 - **部署灵活**：支持多种部署方式（axureshow、BytePlus、本地打开）
 
+## 末日废土版迭代（v2）
+
+### 背景
+
+原始 R3F 版本在功能完整后转向收敛与轻量化：要求能跑在手机浏览器，画面更亮、细节更精细，并最终融入《疯狂的麦克斯》末日废土风格，在远景加入飞船、战车、巨型机器人等叙事元素。
+
+### 关键决策
+
+| 决策 | 选择 | 原因 |
+|------|------|------|
+| 渲染方案 | 原生 Three.js r170 + ESM importmap | 单文件交付，绕开 R3F/构建链，直接浏览器加载 |
+| 版本锁定 | 0.170.0 via jsDelivr | "latest" 会引入不兼容的 API 变更，破坏 ESM 链路 |
+| 后处理 | EffectComposer + RenderPass + UnrealBloomPass + OutputPass | OutputPass 不可省略，否则颜色空间错误导致画面发暗 |
+| 中文标注 | CSS2DRenderer + HTML 标签 | TextGeometry 对中文字体支持差，且需额外加载字体文件 |
+| 重复结构 | InstancedMesh（燃料棒/控制棒/岩石） | 单 draw call，移动端关键优化 |
+| 粒子系统 | THREE.Points + BufferGeometry + 预分配池 | 避免运行时 GC，支持隔帧更新 |
+| 画质分级 | 低/中/高三档，移动端默认低 | 兼顾桌面效果与移动性能 |
+| 物理步进 | 固定 30Hz | 降低计算负载，视觉上足够流畅 |
+| 透明结构 | MeshPhysicalMaterial transmission 0.45 / opacity 0.38 | 压力容器可看穿堆芯，剖切开口更大 |
+| 远景叙事 | 飞船 + 战车 + 巨型机器人 + 背景反应堆 | 用尺度感与机械元素营造末日史诗感 |
+
+### 视觉风格转换
+
+从科技蓝转向末日废土，核心调整：
+
+| 维度 | 科技蓝版 | 末日废土版 |
+|------|---------|-----------|
+| 天空 | 深蓝渐变 | 焦土色径向渐变 + 末日太阳发光球 |
+| 地面 | 金属网格 | Canvas 高度图生成龟裂沙丘 + 散布岩石 |
+| 雾色 | 冷蓝 | 暖橙琥珀 |
+| 粒子 | 中子/光子 | 风沙 + 飘舞废纸 |
+| 远景 | 工业设备剪影 | 低多边形飞船（引擎尾迹）、六轮战车（大灯）、巨型机器人（独眼红光） |
+| 打光 | 冷调方向光 | 暖橙环境光 + 机器人轮廓光 + 胸口反应堆脉冲 |
+
+### 性能策略
+
+- 三档画质通过 `PERF` 对象统一配置：粒子数 125/180/219，几何分段 48/80/128
+- 移动端默认关闭 Bloom、阴影、抗锯齿，`pixelRatio` 上限 1.5
+- 粒子隔帧更新（`frame % 2 === 0`），控制棒矩阵仅在位置变化时更新
+- 单 RAF 循环统一驱动渲染、物理、粒子、动画
+- 远景元素使用低多边形几何 + Sprite 辉光，避免高分段模型
+
+### 移动端适配
+
+- 底部抽屉式控制台（参数滑块、状态显示）
+- 右上角设置按钮（画质切换、FPS 调整）
+- 触控优化 OrbitControls：单指旋转、双指缩放、阻尼感
+- 相机约束 `maxPolarAngle = PI/2 + 0.12`：允许略低于水平线增强张力，但禁止穿地
+
+### 踩过的坑
+
+1. Three.js "latest" 版本不稳定：ESM 链路断裂，锁定 r170 解决
+2. OutputPass 遗漏：画面整体发暗，颜色空间错误
+3. 变量初始化顺序：粒子系统引用了未声明的 reactorGroup/ui/NEUTRON_COUNT，需提前声明并加存在性保护
+4. 地面太平看不到远景：加入 displacementMap + bumpMap 高度图，放大远景物体并调整位置
+5. 模型过于粗糙：细化飞船（双引擎尾迹、驾驶舱）、战车（防滚架、犁刀、六轮）、机器人（肩刺、武器、背部烟囱、呼吸动画）
+6. 黑屏问题：光照与相机设置不当，增强环境光/半球光/方向光后解决
+7. 文件写入权限：chmod u+w 解除文件只读
+8. 过度验证：纯背景/远景调整不需要反复截图测试，应根据改动范围判断验证深度
+
+### 成果
+
+- 单文件 HTML 交付，移动端稳定 60 FPS
+- 末日废土环境与反应堆主体形成视觉层次
+- 三档画质在桌面与移动端均可流畅运行
+- 远景叙事元素（飞船/战车/机器人）不喧宾夺主
+
+### 详细踩坑记录
+
+- [3D/WebGL 架构踩坑](../pitfalls/3d-webgl-architecture.md)（问题 6-10）
+- [性能优化踩坑](../pitfalls/performance.md)（问题 6-9）
+- [移动端布局踩坑](../pitfalls/mobile-layout.md)（问题 10-11）
+
 ## 参考资源
 
 - [压水堆原理](https://zh.wikipedia.org/wiki/%E5%8E%8B%E6%B0%B4%E5%A0%86)
 - [核反应堆物理](https://en.wikipedia.org/wiki/Nuclear_reactor_physics)
 - [React Three Fiber 文档](https://docs.pmnd.rs/react-three-fiber)
 - [Three.js 文档](https://threejs.org/docs/)
+- [Three.js r170 release notes](https://github.com/mrdoob/three.js/releases/tag/r170)
+- [EffectComposer 后处理](https://threejs.org/docs/#examples/en/postprocessing/EffectComposer)
