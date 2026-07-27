@@ -4,7 +4,7 @@ description: |
   从 0 到 1 的完整产品设计流程，结合顶级 UI/UX 设计原则和 SKILL 工具链协作。
   当用户需要创建新产品、优化现有产品、或进行产品设计决策时使用此技能。
   支持：需求分析、UI/UX 设计、技术实现、移动端适配、性能优化、测试发布。
-version: 2.4.0
+version: 2.4.1
 tags: [product-design, uiux, mobile-first, performance, skill-chain, 3d-webgl, math-optimization, single-file-html, cdn-importmap, obsidian-vault-automation]
 ---
 # 产品设计 0 到 1 SKILL

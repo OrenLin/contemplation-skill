@@ -14,7 +14,7 @@
 - **输出模板**：标准化的踩坑记录和项目案例格式
 - **移动优先**：所有设计决策优先考虑移动端体验
 - **性能至上**：每个技术选型都考虑性能影响
-- **实战经验**：3 个真实项目案例 + 5 份详细踩坑记录
+- **实战经验**：6 个真实项目案例 + 8 份详细踩坑记录
 
 ## 📚 文档结构
 
@@ -33,13 +33,19 @@ contemplation-skill/
 ├── examples/                         # 实战案例
 │   ├── contemplation-design.md       # 沉思工具设计案例
 │   ├── divination-optimization.md    # 抽签工具优化案例
-│   └── nuclear-reactor-design.md     # 核反应堆模拟器案例
+│   ├── nuclear-reactor-design.md     # 核反应堆模拟器案例
+│   ├── piecewise-optimization.md     # 分段线性函数优化案例
+│   ├── gravity-tools-lightweight.md  # 引力工具集轻量化迁移案例
+│   └── obsidian-knowledge-system.md  # Obsidian 知识库自动化案例
 └── pitfalls/                         # 踩坑记录
-    ├── webgl-mobile-adaptation.md    # WebGL 移动端适配
-    ├── mobile-layout.md              # 移动端布局问题
-    ├── performance.md                # 性能优化
-    ├── interaction.md                # 交互设计
-    └── 3d-webgl-architecture.md      # 3D/WebGL 架构
+    ├── webgl-mobile-adaptation.md        # WebGL 移动端适配
+    ├── mobile-layout.md                  # 移动端布局问题
+    ├── performance.md                    # 性能优化
+    ├── interaction.md                    # 交互设计
+    ├── 3d-webgl-architecture.md          # 3D/WebGL 架构
+    ├── math-optimization-reasoning.md    # 数学优化推理
+    ├── single-file-html-deployment.md    # 单文件 HTML 轻量化部署
+    └── obsidian-vault-automation.md      # Obsidian Vault 自动化
 ```
 
 ## 🚀 快速开始
@@ -80,6 +86,9 @@ contemplation-skill/
 - 性能问题 → `pitfalls/performance.md`
 - 交互问题 → `pitfalls/interaction.md`
 - 3D 架构问题 → `pitfalls/3d-webgl-architecture.md`
+- 数学优化推理 → `pitfalls/math-optimization-reasoning.md`
+- 单文件 HTML 部署 → `pitfalls/single-file-html-deployment.md`
+- Obsidian Vault 自动化 → `pitfalls/obsidian-vault-automation.md`
 
 ### 5. 提取项目经验
 
@@ -149,6 +158,40 @@ contemplation-skill/
 
 **详细文档**：[examples/nuclear-reactor-design.md](./examples/nuclear-reactor-design.md)
 
+### 案例 4：分段线性函数优化分配
+
+**项目类型**：数学优化推理
+
+**核心亮点**：
+- 分段线性函数最小化问题
+- 排名约束下的资源分配
+- 两阶段枚举 + 构造求解
+
+**详细文档**：[examples/piecewise-optimization.md](./examples/piecewise-optimization.md)
+
+### 案例 5：引力工具集轻量化迁移
+
+**项目类型**：单文件 HTML 轻量化部署
+
+**核心亮点**：
+- 体积从 1.8MB 降至 180KB（减少 90%）
+- CDN importmap 加载 three.js
+- 材质共享 + Vercel 缓存策略
+
+**详细文档**：[examples/gravity-tools-lightweight.md](./examples/gravity-tools-lightweight.md)
+
+### 案例 6：Obsidian 知识库自动化系统
+
+**项目类型**：Python 自动化工具集 + Obsidian 知识库架构
+
+**核心亮点**：
+- 11 个 Python 脚本（6200+ 行），4 阶段 12 子任务
+- 712 篇笔记全量整理（新增 3376 条 wikilink）
+- 配置外部化 + 三级降级，去个人化后可分享
+- 多 Agent 并行编排，保护上下文窗口
+
+**详细文档**：[examples/obsidian-knowledge-system.md](./examples/obsidian-knowledge-system.md)
+
 ## 🔍 踩坑记录索引
 
 ### 1. WebGL 移动端适配
@@ -217,6 +260,53 @@ contemplation-skill/
 
 **详细文档**：[pitfalls/3d-webgl-architecture.md](./pitfalls/3d-webgl-architecture.md)
 
+### 6. 数学优化推理
+
+**核心问题**：
+- 常数项倍乘误判
+- 临界点跨越处理不当
+- 枚举与构造脱节
+- 边际相等简化失效
+
+**解决方案**：
+- 多角度验证（枚举 + 构造 + 边际分析）
+- 临界点显式判断，避免隐式跨越
+- 常数项独立处理，避免倍乘干扰
+
+**详细文档**：[pitfalls/math-optimization-reasoning.md](./pitfalls/math-optimization-reasoning.md)
+
+### 7. 单文件 HTML 轻量化部署
+
+**核心问题**：
+- 内联 base64 导致体积爆炸
+- CDN importmap 配置复杂
+- 材质资源重复加载
+- Vercel 缓存策略不当
+
+**解决方案**：
+- 优先 CDN importmap 加载 three.js
+- 材质共享，避免重复实例化
+- 轻量级转移策略（blackhole 1.8MB → reactor 180KB）
+
+**详细文档**：[pitfalls/single-file-html-deployment.md](./pitfalls/single-file-html-deployment.md)
+
+### 8. Obsidian Vault 自动化
+
+**核心问题**：
+- iCloud 路径无法用工具直接访问
+- Frontmatter 解析边界情况
+- 硬编码个人数据导致不可分享
+- Wikilink 去重、Canvas JSON、Dataview 语法兼容性
+- 多 Agent 并行上下文撑爆
+
+**解决方案**：
+- 统一用 Python 脚本读写 Vault
+- 基于行扫描的自定义 frontmatter 解析器
+- config.yaml + 三级降级配置
+- 分阶段并行，sub-agent 只返回摘要
+
+**详细文档**：[pitfalls/obsidian-vault-automation.md](./pitfalls/obsidian-vault-automation.md)
+
 ## ✅ 检查清单
 
 ### 设计阶段
@@ -257,7 +347,42 @@ contemplation-skill/
 - [压水堆原理](https://zh.wikipedia.org/wiki/%E5%8E%8B%E6%B0%B4%E5%A0%86)
 - [核反应堆物理](https://en.wikipedia.org/wiki/Nuclear_reactor_physics)
 
+### Obsidian 自动化参考
+- [Obsidian Dataview](https://blacksmithgu.github.io/obsidian-dataview/) - 笔记查询
+- [Obsidian Canvas 格式](https://help.obsidian.md/Canvas/Canvas+format) - Canvas JSON
+- [Obsidian Templater](https://silentvoid13.github.io/Templater/) - 模板引擎
+- [Galaxy View 插件](https://github.com/NexusSteve/obsidian-galaxy) - 星系可视化
+
 ## 📝 版本历史
+
+- **v2.4.1** (2026-07-27)
+  - 文档同步：MAINTENANCE.md、README.md 与 SKILL.md v2.4.0 对齐
+  - 补全文件树、案例概览、踩坑索引、版本历史
+  - 类型映射表新增单文件 HTML 部署、Obsidian Vault 自动化
+
+- **v2.4.0** (2026-07-27)
+  - 新增 Obsidian 知识库自动化项目案例（11 脚本 6200+ 行，712 笔记全量整理）
+  - 新增 Obsidian Vault 自动化踩坑记录（8 个问题）
+  - tags 新增 obsidian-vault-automation
+
+- **v2.3.0** (2026-07-27)
+  - 新增引力工具集轻量化迁移项目案例（1.8MB → 180KB，减少 90%）
+  - 新增单文件 HTML 轻量化部署踩坑记录
+  - tags 新增 single-file-html、cdn-importmap
+
+- **v2.2.0** (2026-07-27)
+  - 核反应堆模拟器追加末日废土版 v2 迭代案例
+  - 3D/WebGL 架构、性能、移动端布局踩坑扩充
+
+- **v2.1.0** (2026-07-11)
+  - 新增分段线性函数优化分配项目案例
+  - 新增数学优化推理踩坑记录（5 个问题）
+  - MAINTENANCE.md 文件树与类型映射表同步
+
+- **v2.0.0** (2026-06)
+  - SKILL 结构重构：引入 commands/、templates/、MAINTENANCE.md 多项目经验积累框架
+  - 斜杠命令体系（/extract-experience、/generate-docs）
+  - 标准化踩坑与案例输出模板
 
 - **v1.1.0** (2026-06-22)
   - 新增核反应堆模拟器案例
