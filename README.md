@@ -14,7 +14,7 @@
 - **输出模板**：标准化的踩坑记录和项目案例格式
 - **移动优先**：所有设计决策优先考虑移动端体验
 - **性能至上**：每个技术选型都考虑性能影响
-- **实战经验**：6 个真实项目案例 + 8 份详细踩坑记录
+- **实战经验**：7 个真实项目案例 + 9 份详细踩坑记录
 
 ## 📚 文档结构
 
@@ -36,7 +36,8 @@ contemplation-skill/
 │   ├── nuclear-reactor-design.md     # 核反应堆模拟器案例
 │   ├── piecewise-optimization.md     # 分段线性函数优化案例
 │   ├── gravity-tools-lightweight.md  # 引力工具集轻量化迁移案例
-│   └── obsidian-knowledge-system.md  # Obsidian 知识库自动化案例
+│   ├── obsidian-knowledge-system.md  # Obsidian 知识库自动化案例
+│   └── hand-ar-spaceship.md          # Hand-AR 飞船展板案例
 └── pitfalls/                         # 踩坑记录
     ├── webgl-mobile-adaptation.md        # WebGL 移动端适配
     ├── mobile-layout.md                  # 移动端布局问题
@@ -45,7 +46,8 @@ contemplation-skill/
     ├── 3d-webgl-architecture.md          # 3D/WebGL 架构
     ├── math-optimization-reasoning.md    # 数学优化推理
     ├── single-file-html-deployment.md    # 单文件 HTML 轻量化部署
-    └── obsidian-vault-automation.md      # Obsidian Vault 自动化
+    ├── obsidian-vault-automation.md      # Obsidian Vault 自动化
+    └── unity-ar-hand-tracking.md          # Unity AR 手部追踪
 ```
 
 ## 🚀 快速开始
@@ -89,6 +91,7 @@ contemplation-skill/
 - 数学优化推理 → `pitfalls/math-optimization-reasoning.md`
 - 单文件 HTML 部署 → `pitfalls/single-file-html-deployment.md`
 - Obsidian Vault 自动化 → `pitfalls/obsidian-vault-automation.md`
+- Unity AR 手部追踪 → `pitfalls/unity-ar-hand-tracking.md`
 
 ### 5. 提取项目经验
 
@@ -179,6 +182,19 @@ contemplation-skill/
 - 材质共享 + Vercel 缓存策略
 
 **详细文档**：[examples/gravity-tools-lightweight.md](./examples/gravity-tools-lightweight.md)
+
+### 案例 7：Hand-AR 数字化宇宙飞船展板
+
+**项目类型**：Unity AR 手势交互应用
+
+**核心亮点**：
+- Unity + MediaPipe 手部追踪，21 点关键点
+- 三手势系统（张手爆炸 / 握拳还原 / 食指蓝图）
+- 三程序集分离架构（核心/MediaPipe/Editor 独立）
+- MCP 正交坐标系旋转，稳定性提升 5 倍
+- 捏合三重滤波（迟滞 + 防抖 + 朝向校验）
+
+**详细文档**：[examples/hand-ar-spaceship.md](./examples/hand-ar-spaceship.md)
 
 ### 案例 6：Obsidian 知识库自动化系统
 
@@ -290,6 +306,28 @@ contemplation-skill/
 
 **详细文档**：[pitfalls/single-file-html-deployment.md](./pitfalls/single-file-html-deployment.md)
 
+### 9. Unity AR 手部追踪
+
+**核心问题**：
+- Mock 模式覆盖真实手部数据
+- 相机背景 Canvas 遮挡 3D 模型
+- 前置摄像头坐标轴翻转
+- 短向量旋转计算不稳定
+- 捏合手势误触发
+- 插件菜单在 Tuanjie Hub 中不显示
+- Z 距离与旋转跳变
+
+**解决方案**：
+- 反射禁用 Mock 模式
+- ScreenSpaceCamera + planeDistance=50
+- 前置摄像头 X 翻转（x = 1 - x）
+- MCP 正交坐标系替代短向量（5x 稳定）
+- 三重滤波（迟滞双阈值 + 防抖 + 掌心朝向）
+- 移除外层条件编译，方法内条件检查
+- Z 钳制 0.15~2m + 旋转跳变 >60° 丢弃
+
+**详细文档**：[pitfalls/unity-ar-hand-tracking.md](./pitfalls/unity-ar-hand-tracking.md)
+
 ### 8. Obsidian Vault 自动化
 
 **核心问题**：
@@ -354,6 +392,12 @@ contemplation-skill/
 - [Galaxy View 插件](https://github.com/NexusSteve/obsidian-galaxy) - 星系可视化
 
 ## 📝 版本历史
+
+- **v2.6.0** (2026-07-27)
+  - 新增 Hand-AR 数字化宇宙飞船展板项目案例（Unity + MediaPipe，18 脚本，7 踩坑）
+  - 新增 Unity AR 手部追踪踩坑记录（7 个问题：Mock 覆盖、Canvas 遮挡、坐标翻转、旋转不稳定、捏合误触、Hub 菜单、Z 距离跳变）
+  - tags 新增 unity-ar
+  - 三处索引同步（SKILL/MAINTENANCE/README）
 
 - **v2.5.1** (2026-07-27)
   - **SKILL.md 规范化适配 TRAE 导入**（依据 [官方 Skill 文档](https://docs.trae.cn/ide_skills)）
