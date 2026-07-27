@@ -28,7 +28,8 @@ contemplation-skill/
 │   ├── nuclear-reactor-design.md     # 核反应堆模拟器案例
 │   ├── piecewise-optimization.md     # 分段线性函数优化案例
 │   ├── gravity-tools-lightweight.md  # 引力工具集轻量化迁移案例
-│   └── obsidian-knowledge-system.md  # Obsidian 知识库自动化案例
+│   ├── obsidian-knowledge-system.md  # Obsidian 知识库自动化案例
+│   └── hand-ar-spaceship.md          # Hand-AR 飞船展板案例
 └── pitfalls/                         # 踩坑记录
     ├── webgl-mobile-adaptation.md        # WebGL 移动端适配
     ├── mobile-layout.md                  # 移动端布局
@@ -37,7 +38,8 @@ contemplation-skill/
     ├── 3d-webgl-architecture.md          # 3D/WebGL 架构
     ├── math-optimization-reasoning.md    # 数学优化推理
     ├── single-file-html-deployment.md    # 单文件 HTML 轻量化部署
-    └── obsidian-vault-automation.md      # Obsidian Vault 自动化
+    ├── obsidian-vault-automation.md      # Obsidian Vault 自动化
+    └── unity-ar-hand-tracking.md          # Unity AR 手部追踪
 ```
 
 ## 更新流程
@@ -74,6 +76,7 @@ contemplation-skill/
 | 数学优化推理 | `pitfalls/math-optimization-reasoning.md` | 分段函数、常数项倍乘、临界点跨越 |
 | 单文件 HTML 部署 | `pitfalls/single-file-html-deployment.md` | importmap/CDN、轻量级转移、材质共享、Vercel 缓存 |
 | Obsidian Vault 自动化 | `pitfalls/obsidian-vault-automation.md` | iCloud 路径、frontmatter 解析、去个人化、多 Agent 编排 |
+| Unity AR 手部追踪 | `pitfalls/unity-ar-hand-tracking.md` | Mock 覆盖、Canvas 遮挡、坐标翻转、旋转不稳定、捏合误触 |
 | 新类型 | 创建新文件 | 不在上述范围内的类型 |
 
 **步骤 2**：使用模板格式化
@@ -170,8 +173,8 @@ N. [新踩坑](./pitfalls/[filename].md) - [简要描述]
 name: product-design-0to1
 description: |
   [描述]
-version: 2.5.0  # 更新这里
-tags: [product-design, uiux, mobile-first, performance, skill-chain, 3d-webgl, math-optimization, single-file-html, cdn-importmap, obsidian-vault-automation, desensitization-gate]
+version: 2.6.0  # 更新这里
+tags: [product-design, uiux, mobile-first, performance, skill-chain, 3d-webgl, math-optimization, single-file-html, cdn-importmap, obsidian-vault-automation]
 ---
 ```
 
