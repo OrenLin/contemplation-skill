@@ -4,8 +4,8 @@ description: |
   从 0 到 1 的完整产品设计流程，结合顶级 UI/UX 设计原则和 SKILL 工具链协作。
   当用户需要创建新产品、优化现有产品、或进行产品设计决策时使用此技能。
   支持：需求分析、UI/UX 设计、技术实现、移动端适配、性能优化、测试发布。
-version: 2.2.0
-tags: [product-design, uiux, mobile-first, performance, skill-chain, 3d-webgl, math-optimization]
+version: 2.3.0
+tags: [product-design, uiux, mobile-first, performance, skill-chain, 3d-webgl, math-optimization, single-file-html, cdn-importmap]
 ---
 
 # 产品设计 0 到 1 SKILL
@@ -95,8 +95,9 @@ build: {
 - 后处理链：EffectComposer 必须以 OutputPass 结尾
 - 中文标注：使用 CSS2DRenderer + HTML 标签，禁用 TextGeometry
 - 重复结构：使用 InstancedMesh 单 draw call 渲染
+- 单文件 HTML：优先 CDN importmap，避免内联 base64 体积爆炸
 
-**参考**：[pitfalls/3d-webgl-architecture.md](./pitfalls/3d-webgl-architecture.md)
+**参考**：[pitfalls/3d-webgl-architecture.md](./pitfalls/3d-webgl-architecture.md)、[pitfalls/single-file-html-deployment.md](./pitfalls/single-file-html-deployment.md)
 
 ---
 
@@ -132,8 +133,10 @@ build: {
 - 三档画质分级（低/中/高），移动端默认低
 - 物理模拟固定 30Hz 步进
 - 粒子使用预分配对象池 + 隔帧更新
+- 单文件 HTML 用 CDN importmap 加载 three.js（避免内联 base64）
+- 纹理分辨率按画质分级（2048/1024/512），函数属性缓存避免重复生成
 
-**参考**：[pitfalls/performance.md](./pitfalls/performance.md)
+**参考**：[pitfalls/performance.md](./pitfalls/performance.md)、[pitfalls/single-file-html-deployment.md](./pitfalls/single-file-html-deployment.md)
 
 ---
 
@@ -191,6 +194,7 @@ git push origin main
 4. [交互设计](./pitfalls/interaction.md) - 触摸反馈、手势支持
 5. [3D/WebGL 架构](./pitfalls/3d-webgl-architecture.md) - Canvas 生命周期、粒子分层、版本锁定、后处理、InstancedMesh
 6. [数学优化推理](./pitfalls/math-optimization-reasoning.md) - 常数项倍乘、临界点跨越、枚举与构造脱节、多角度验证
+7. [单文件 HTML 轻量化部署](./pitfalls/single-file-html-deployment.md) - importmap/CDN/轻量级转移/材质共享/Vercel 缓存
 
 ---
 
@@ -207,6 +211,9 @@ git push origin main
 
 4. **分段线性函数优化分配** - 分段函数最小化，排名约束，两阶段枚举+构造
    - [详细文档](./examples/piecewise-optimization.md)
+
+5. **引力工具集轻量化迁移** - blackhole 1.8MB → reactor 180KB，CDN importmap，体积减少 90%
+   - [详细文档](./examples/gravity-tools-lightweight.md)
 
 ---
 
