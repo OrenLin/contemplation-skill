@@ -355,6 +355,14 @@ contemplation-skill/
 
 ## 📝 版本历史
 
+- **v2.5.0** (2026-07-27)
+  - **脱敏 gate**：`extract-experience` 新增第 7.5 步强制脱敏审查（识别类/技术类/数据类/个人信息 4 类检查项）
+  - **review gate**：取消自动 push，改为生成变更摘要 + 人工确认后才推送（公开仓库不可逆）
+  - **三处索引闭环**：第 6 步从"只更新 SKILL.md"改为同步更新 SKILL/MAINTENANCE/README，附同步检查清单
+  - **单一信源**：第 4 步删除过时的类型列表，改为引用 MAINTENANCE.md 类型映射表
+  - **模板脱敏字段**：project-example 新增"脱敏声明"，pitfall 新增"脱敏提示"
+  - tags 新增 `desensitization-gate`
+
 - **v2.4.1** (2026-07-27)
   - 文档同步：MAINTENANCE.md、README.md 与 SKILL.md v2.4.0 对齐
   - 补全文件树、案例概览、踩坑索引、版本历史

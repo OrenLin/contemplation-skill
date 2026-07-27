@@ -4,8 +4,8 @@ description: |
   从 0 到 1 的完整产品设计流程，结合顶级 UI/UX 设计原则和 SKILL 工具链协作。
   当用户需要创建新产品、优化现有产品、或进行产品设计决策时使用此技能。
   支持：需求分析、UI/UX 设计、技术实现、移动端适配、性能优化、测试发布。
-version: 2.4.1
-tags: [product-design, uiux, mobile-first, performance, skill-chain, 3d-webgl, math-optimization, single-file-html, cdn-importmap, obsidian-vault-automation]
+version: 2.5.0
+tags: [product-design, uiux, mobile-first, performance, skill-chain, 3d-webgl, math-optimization, single-file-html, cdn-importmap, obsidian-vault-automation, desensitization-gate]
 ---
 # 产品设计 0 到 1 SKILL
 ## 快速开始
@@ -166,7 +166,9 @@ git push origin main
 新项目完成后，使用 `/extract-experience` 命令提取经验：
 1. 识别踩过的坑 → 添加到对应 `pitfalls/` 文件
 2. 总结关键决策 → 添加到 `examples/` 目录
-3. 更新 SKILL.md 索引 → 保持文档同步
+3. 同步更新三处索引 → SKILL.md / MAINTENANCE.md / README.md
+4. 脱敏审查（真实项目必做）→ 详见 [extract-experience.md 第 7.5 步](./commands/extract-experience.md)
+5. 人工确认后才 push → 公开仓库不可逆
 详见 [MAINTENANCE.md](./MAINTENANCE.md)
 ---
 ## 检查清单

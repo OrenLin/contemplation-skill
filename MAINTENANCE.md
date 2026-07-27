@@ -170,20 +170,47 @@ N. [新踩坑](./pitfalls/[filename].md) - [简要描述]
 name: product-design-0to1
 description: |
   [描述]
-version: 2.4.1  # 更新这里
-tags: [product-design, uiux, mobile-first, performance, skill-chain, 3d-webgl, math-optimization, single-file-html, cdn-importmap, obsidian-vault-automation]
+version: 2.5.0  # 更新这里
+tags: [product-design, uiux, mobile-first, performance, skill-chain, 3d-webgl, math-optimization, single-file-html, cdn-importmap, obsidian-vault-automation, desensitization-gate]
 ---
 ```
 
-### 3. 提交变更
+#### 2.4 同步三处索引（v2.5.0 起强制）
+
+新增踩坑或案例时，必须同步更新以下三个文件，不得只更新主文档（详见 [commands/extract-experience.md 第 6 步](./commands/extract-experience.md)）：
+
+| 文件 | 更新内容 |
+|------|----------|
+| `SKILL.md` | 踩坑索引、案例索引、frontmatter 版本与 tags |
+| `MAINTENANCE.md` | 文件树、类型映射表（仅新 pitfalls 时）、版本示例 |
+| `README.md` | 统计数字、文件树、案例概览、踩坑索引、版本历史 |
+
+**同步检查清单**：
+- [ ] 三处文件树文件数一致
+- [ ] 统计数字一致（案例数 / 踩坑数）
+- [ ] 版本号三处一致
+- [ ] 索引条目数 = 实际文件数
+
+#### 2.5 脱敏审查（v2.5.0 起强制 gate）
+
+涉及真实项目内容时，提交前必须执行脱敏审查，详见"质量保证 > 脱敏审查"章节。未通过审查不得提交。
+
+### 3. 提交变更（review gate，不自动 push）
+
+**重要**：v2.5.0 起取消自动 push。公开仓库不可逆，push 前必须人工确认。
 
 ```bash
-git add -A
+# 1. 生成变更摘要 + 脱敏审查结果，输出给用户
+# 2. 等待用户明确确认后，执行：
+git add SKILL.md MAINTENANCE.md README.md [新增/修改的文件]
 git commit -m "docs: [变更类型]
 
 - [变更 1]
 - [变更 2]
+- 三处索引同步
+- 脱敏审查：✅ 通过
 - 更新版本号 x.x.x → x.x.x"
+# 3. 仅在用户明确要求 push 时执行：
 git push origin main
 ```
 
@@ -261,7 +288,23 @@ Agent 看到链接后，根据当前任务决定是否读取。
 - 外部链接可访问
 - 链接文本清晰
 
-### 4. 语言一致性
+### 4. 脱敏审查（公开仓库强制 gate）
+
+**要求**：本仓库为公开 GitHub 仓库，从真实项目提取经验时，脱敏审查为强制步骤，不得跳过。详见 [commands/extract-experience.md 第 7.5 步](./commands/extract-experience.md)。
+
+**检查项**（4 类）：
+- 识别类：部门/公司/用户群/团队规模 → 泛化或删除
+- 技术类：API/域名/内部服务/包名/文档链接 → 占位符
+- 数据类：业务数据/日志/表名字段名 → 合成数据
+- 个人信息：邮箱/手机/工号/姓名/社交链接 → 删除
+
+**模板字段**：
+- 项目案例：`templates/project-example.md` 末尾的"脱敏声明"（涉及真实项目时必填）
+- 踩坑记录：`templates/pitfall.md` 的"脱敏提示"（代码示例来自真实项目时必填）
+
+**原则**：宁可过度脱敏也不可遗漏。一旦推送到公开仓库即不可逆。
+
+### 5. 语言一致性
 
 **要求**：
 - 所有文档使用同一种语言（中文）
