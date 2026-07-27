@@ -1,17 +1,25 @@
 ---
 name: product-design-0to1
-description: |
-  从 0 到 1 的完整产品设计流程，结合顶级 UI/UX 设计原则和 SKILL 工具链协作。
-  当用户需要创建新产品、优化现有产品、或进行产品设计决策时使用此技能。
-  支持：需求分析、UI/UX 设计、技术实现、移动端适配、性能优化、测试发布。
-version: 2.5.0
+description: 从 0 到 1 的完整产品设计流程技能。当用户需要创建新产品、优化现有产品、进行 UI/UX 设计、技术实现、移动端适配、性能优化或测试发布决策时使用。覆盖需求分析、3D/WebGL、单文件部署、Obsidian 自动化等场景。
+version: 2.5.1
 tags: [product-design, uiux, mobile-first, performance, skill-chain, 3d-webgl, math-optimization, single-file-html, cdn-importmap, obsidian-vault-automation, desensitization-gate]
 ---
 # 产品设计 0 到 1 SKILL
+## 何时使用
+当出现以下情况时，智能体应加载此技能：
+- 创建新产品或新功能，需要从需求分析开始
+- 进行 UI/UX 设计决策（视觉层次、移动端布局、可访问性）
+- 技术选型与实现（3D/WebGL、单文件 HTML、性能优化）
+- 移动端适配问题（安全区域、触摸区域、响应式）
+- 性能优化（包体积、首屏、运行时卡顿）
+- 从真实项目提取经验到 SKILL 文档库（约定指令：extract-experience）
+- 生成产品文档与介绍（约定指令：generate-docs）
+
+**触发方式**：直接说"用 product-design 技能..."，或智能体根据任务自动判断加载。
 ## 快速开始
 1. 确定当前阶段：需求分析 / UI 设计 / 技术实现 / 移动端适配 / 测试发布
 2. 按需加载对应资源文件
-3. 使用斜杠命令快速执行常用任务
+3. 使用约定指令快速执行常用任务（详见下方"约定指令"节）
 ## 核心原则
 1. **移动优先** - 所有设计优先考虑移动端
 2. **性能至上** - 每个技术选型考虑性能影响
@@ -118,13 +126,15 @@ git commit -m "feat: 完成功能 X"
 git push origin main
 ```
 ---
-## 斜杠命令
-使用 `/` 前缀快速执行常用任务：
-- `/brainstorm` - 启动需求头脑风暴
-- `/plan` - 生成实现计划
-- `/build` - 执行构建流程
-- `/extract-experience` - 从当前项目提取经验到 SKILL
-- `/generate-docs` - 生成产品文档和介绍
+## 约定指令
+> 以下指令通过**自然语言触发**，不是 TRAE 内置斜杠命令。需先加载本技能后，由智能体识别执行。使用方式：向 AI 说"用 product-design 技能执行 extract-experience"或"帮我提取项目经验"。
+
+- **brainstorm** - 启动需求头脑风暴
+- **plan** - 生成实现计划
+- **build** - 执行构建流程
+- **extract-experience** - 从当前项目提取经验到 SKILL（详见 [commands/extract-experience.md](./commands/extract-experience.md)）
+- **generate-docs** - 生成产品文档和介绍（详见 [commands/generate-docs.md](./commands/generate-docs.md)）
+
 详见 [commands/](./commands/) 目录
 ---
 ## 工具链
@@ -163,7 +173,7 @@ git push origin main
    - [详细文档](./examples/obsidian-knowledge-system.md)
 ---
 ## 维护规则
-新项目完成后，使用 `/extract-experience` 命令提取经验：
+新项目完成后，使用 extract-experience 约定指令提取经验（向 AI 说"用 product-design 技能执行 extract-experience"）：
 1. 识别踩过的坑 → 添加到对应 `pitfalls/` 文件
 2. 总结关键决策 → 添加到 `examples/` 目录
 3. 同步更新三处索引 → SKILL.md / MAINTENANCE.md / README.md
@@ -202,3 +212,11 @@ git push origin main
 - [Obsidian Canvas 格式](https://help.obsidian.md/Canvas/Canvas+format) - Canvas JSON
 - [Obsidian Templater](https://silentvoid13.github.io/Templater/) - 模板引擎
 - [Galaxy View 插件](https://github.com/NexusSteve/obsidian-galaxy) - 星系可视化
+---
+## 导入说明（TRAE 技能）
+本技能可通过 TRAE 的"设置 > 技能与命令 > 创建 > 上传 .zip"导入：
+- **上传格式**：包含根级 `SKILL.md` 的 `.zip` 文件（官方不支持 `.skill` 格式）
+- **全局技能**导入后存放在 `~/.trae-cn/skills/product-design-0to1/`（macOS/Linux）
+- **项目技能**导入后存放在 `.trae/skills/product-design-0to1/`
+- **子文件链接**：`./pitfalls/xxx.md`、`./examples/xxx.md` 等相对路径在导入后保持有效，智能体按需加载
+- **激活方式**：用自然语言"用 product-design 技能..."手动调用，或由 AI 根据 description 自动判断加载（非 `/` 斜杠命令激活）
