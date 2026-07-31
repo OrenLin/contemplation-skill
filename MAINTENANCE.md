@@ -29,7 +29,8 @@ contemplation-skill/
 │   ├── piecewise-optimization.md     # 分段线性函数优化案例
 │   ├── gravity-tools-lightweight.md  # 引力工具集轻量化迁移案例
 │   ├── obsidian-knowledge-system.md  # Obsidian 知识库自动化案例
-│   └── hand-ar-spaceship.md          # Hand-AR 飞船展板案例
+│   ├── hand-ar-spaceship.md          # Hand-AR 飞船展板案例
+│   └── protein-analysis.md          # 蛋白质结构可视化案例
 └── pitfalls/                         # 踩坑记录
     ├── webgl-mobile-adaptation.md        # WebGL 移动端适配
     ├── mobile-layout.md                  # 移动端布局

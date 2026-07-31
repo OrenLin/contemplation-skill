@@ -14,7 +14,7 @@
 - **输出模板**：标准化的踩坑记录和项目案例格式
 - **移动优先**：所有设计决策优先考虑移动端体验
 - **性能至上**：每个技术选型都考虑性能影响
-- **实战经验**：7 个真实项目案例 + 9 份详细踩坑记录
+- **实战经验**：8 个真实项目案例 + 9 份详细踩坑记录
 
 ## 📚 文档结构
 
@@ -37,7 +37,8 @@ contemplation-skill/
 │   ├── piecewise-optimization.md     # 分段线性函数优化案例
 │   ├── gravity-tools-lightweight.md  # 引力工具集轻量化迁移案例
 │   ├── obsidian-knowledge-system.md  # Obsidian 知识库自动化案例
-│   └── hand-ar-spaceship.md          # Hand-AR 飞船展板案例
+│   ├── hand-ar-spaceship.md          # Hand-AR 飞船展板案例
+│   └── protein-analysis.md          # 蛋白质结构可视化案例
 └── pitfalls/                         # 踩坑记录
     ├── webgl-mobile-adaptation.md        # WebGL 移动端适配
     ├── mobile-layout.md                  # 移动端布局问题
@@ -196,6 +197,18 @@ contemplation-skill/
 
 **详细文档**：[examples/hand-ar-spaceship.md](./examples/hand-ar-spaceship.md)
 
+### 案例 8：蛋白质结构可视化工具
+
+**项目类型**：生物信息学 Web 可视化
+
+**核心亮点**：
+- Molstar 5.5.0 + CDN iframe 隔离，绕过 Next.js 16 Turbopack 循环依赖
+- React StrictMode iframe 复用 + 延迟清理，解决 3D 结构画布空白
+- IntersectionObserver 懒加载 + 200px 预加载，避免多实例 WebGL 竞争
+- 三层降级兜底（3D → PAE 热图 → 文件下载）
+
+**详细文档**：[examples/protein-analysis.md](./examples/protein-analysis.md)
+
 ### 案例 6：Obsidian 知识库自动化系统
 
 **项目类型**：Python 自动化工具集 + Obsidian 知识库架构
@@ -266,6 +279,7 @@ contemplation-skill/
 - 粒子系统性能问题
 - 响应式 3D 场景布局
 - 科学可视化参数不准确
+- React StrictMode 下 iframe 重复创建导致 Molstar 渲染失败
 
 **解决方案**：
 - Canvas 始终挂载，用 opacity 切换可见性
@@ -273,6 +287,7 @@ contemplation-skill/
 - 粒子按物理过程分层（快中子、热中子、裂变碎片等）
 - 三重设备检测 + 手动切换
 - 基于真实物理数据校准参数
+- iframe 复用 + 延迟清理 + postMessage 状态同步
 
 **详细文档**：[pitfalls/3d-webgl-architecture.md](./pitfalls/3d-webgl-architecture.md)
 
@@ -392,6 +407,11 @@ contemplation-skill/
 - [Galaxy View 插件](https://github.com/NexusSteve/obsidian-galaxy) - 星系可视化
 
 ## 📝 版本历史
+
+- **v2.7.0** (2026-07-31)
+  - 新增蛋白质结构可视化工具项目案例（Molstar + iframe 隔离，StrictMode 复用，三层降级兜底）
+  - 3D/WebGL 架构踩坑新增问题 11（React StrictMode 下 iframe 重复创建导致 Molstar 渲染失败）
+  - 三处索引同步（SKILL/MAINTENANCE/README）
 
 - **v2.6.0** (2026-07-27)
   - 新增 Hand-AR 数字化宇宙飞船展板项目案例（Unity + MediaPipe，18 脚本，7 踩坑）

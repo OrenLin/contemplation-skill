@@ -626,6 +626,154 @@ function initParticles() {
 
 ---
 
+## 问题 11：React StrictMode 下 iframe 重复创建导致 Molstar 渲染失败
+
+### 症状
+- 3D 结构渲染成功但画布完全空白
+- 能够拖动旋转、滚轮缩放左下角的视图控件，但蛋白质模型始终不显示
+- 控制台无明显错误，Molstar 日志显示加载完成
+- 独立打开 iframe 页面时结构显示正常，嵌入到 React 组件后消失
+
+### 根本原因
+
+1. **React StrictMode double-invoke**：开发模式下 StrictMode 会故意 double-invoke effect（mount → cleanup → remount），以暴露副作用清理问题。如果 effect 在 cleanup 中销毁了 iframe，就会经历"创建→销毁→重建"的循环。
+2. **WebGL 上下文丢失**：iframe 被从 DOM 移除时，Molstar 的 WebGL 上下文随之销毁。重建 iframe 时 Molstar 需要重新初始化，但由于时机问题，初始化往往不完整——控件 UI 能渲染，但 3D 场景内容为空。
+3. **IntersectionObserver ref 失效**：使用 `useRef` 跟踪懒加载目标元素时，StrictMode remount 后 `ref.current` 可能指向已被移除的旧 DOM 节点，导致 Observer 无法触发，组件卡在"待加载"状态。
+4. **同一个 BUG 反复修复失败**：因为根因是 React 生命周期与 iframe/WebGL 生命周期的冲突（架构层问题），而非单纯的渲染逻辑错误。在渲染代码上反复修补无法解决，必须从 iframe 生命周期管理入手。
+
+### 解决方案
+
+**核心思路：iframe 复用 + 延迟清理 + 状态同步**
+
+**方案 A（推荐）：iframe 复用，仅在组件真正卸载时清理**
+
+```typescript
+// 用 ref 跟踪已创建的 iframe，相同 URL 时复用而非重建
+const iframeRef = useRef<HTMLIFrameElement | null>(null)
+const messageHandlerRef = useRef<((event: MessageEvent) => void) | null>(null)
+
+useEffect(() => {
+  // ... 定时器设置 ...
+
+  const container = containerRef.current
+  let iframe = iframeRef.current
+  // 只有 URL 变化或 iframe 不在当前 container 中时才重建
+  const needsRecreate = !iframe || iframe.dataset.src !== src || !container.contains(iframe)
+  if (needsRecreate) {
+    if (iframe && iframe.parentNode) iframe.parentNode.removeChild(iframe)
+    container.innerHTML = ''
+    iframe = document.createElement('iframe')
+    iframe.src = src
+    iframe.dataset.src = src
+    iframeRef.current = iframe
+    container.appendChild(iframe)
+  }
+
+  // 复用已有 iframe 时，主动查询状态以同步 UI
+  if (!needsRecreate && iframe.contentWindow) {
+    iframe.contentWindow.postMessage({ type: 'molstar-query-status' }, '*')
+  }
+
+  // ... postMessage 监听 ...
+
+  return () => {
+    cancelled = true
+    clearAllTimers()
+    // 关键：cleanup 只移除事件监听器/定时器，不销毁 iframe DOM
+    // iframe 在组件真正卸载时才移除（见下方的 unmount effect）
+    if (messageHandlerRef.current) {
+      window.removeEventListener('message', messageHandlerRef.current)
+      messageHandlerRef.current = null
+    }
+  }
+}, [structure?.cifUrl, structure?.pdbUrl])
+
+// 组件真正卸载时才从 DOM 中移除 iframe
+useEffect(() => {
+  return () => {
+    if (iframeRef.current && iframeRef.current.parentNode) {
+      iframeRef.current.parentNode.removeChild(iframeRef.current)
+    }
+    iframeRef.current = null
+  }
+}, [])
+```
+
+**方案 B：IntersectionObserver 用 state + ref callback 替代 useRef**
+
+```typescript
+// ❌ useRef 在 StrictMode remount 后可能指向失效的 DOM 节点
+// const wrapperRef = useRef<HTMLDivElement | null>(null)
+
+// ✅ 用 state + ref callback 跟踪最新 DOM 元素
+const [wrapperEl, setWrapperEl] = useState<HTMLDivElement | null>(null)
+
+useEffect(() => {
+  if (!wrapperEl) return
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+          io.disconnect()
+          break
+        }
+      }
+    },
+    { rootMargin: '200px 0px', threshold: 0.01 }
+  )
+  io.observe(wrapperEl)
+  return () => io.disconnect()
+}, [wrapperEl])
+
+// JSX 中使用 ref callback
+<div ref={setWrapperEl}>...</div>
+```
+
+**iframe 页面侧：响应状态查询（postMessage）**
+
+```html
+<script>
+  var molstarReady = false;
+  var molstarError = null;
+  var currentStatus = 'initializing';
+
+  // 响应父组件的状态查询（StrictMode remount 后复用 iframe 时需要）
+  window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'molstar-query-status') {
+      if (molstarReady) {
+        postToParent({ type: 'molstar-ready' });
+      } else if (molstarError) {
+        postToParent({ type: 'molstar-error', message: molstarError });
+      } else {
+        postToParent({ type: 'molstar-status', message: currentStatus });
+      }
+    }
+  });
+</script>
+```
+
+**推荐方案**：方案 A + 方案 B 组合使用。方案 A 解决 iframe 重复创建销毁问题，方案 B 解决懒加载触发失效问题。两者根因都是 StrictMode remount 导致的引用失效。
+
+### 验证清单
+- [ ] StrictMode 开启状态下，3D 结构首次加载即可见
+- [ ] 组件卸载后重新挂载，iframe 正确复用且结构可见
+- [ ] 切换不同基因（URL 变化）时 iframe 正确重建
+- [ ] IntersectionObserver 在 StrictMode remount 后仍能触发
+- [ ] 控制台无 WebGL context lost 错误
+- [ ] postMessage 状态查询能正确同步父组件 UI
+
+### 脱敏提示
+
+> 代码示例来自真实项目，已执行脱敏审查：
+> - 内部 API 路由 `/api/xxx` → 保留路径结构（通用模式，无识别性）
+> - 基因名、UniProt accession → 使用泛化示例
+> - 组件名 `ProteinStructure3d` → 保留（通用描述，无识别性）
+>
+> 已脱敏：是　审查人：Agent　日期：2026-07-31
+
+---
+
 ## 验证清单
 
 - [ ] Canvas 始终挂载，不随 Tab 切换卸载
