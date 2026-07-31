@@ -1,7 +1,7 @@
 ---
 name: product-design-0to1
 description: 从 0 到 1 的完整产品设计流程技能。当用户需要创建新产品、优化现有产品、进行 UI/UX 设计、技术实现、移动端适配、性能优化或测试发布决策时使用。覆盖需求分析、3D/WebGL、单文件部署、Obsidian 自动化等场景。
-version: 2.6.0
+version: 2.7.0
 tags: [product-design, uiux, mobile-first, performance, skill-chain, 3d-webgl, math-optimization, single-file-html, cdn-importmap, obsidian-vault-automation, desensitization-gate, unity-ar]
 ---
 # 产品设计 0 到 1 SKILL
@@ -153,7 +153,7 @@ git push origin main
 2. [移动端布局](./pitfalls/mobile-layout.md) - 安全区域、折叠按钮、z-index、3D 控制台、相机约束
 3. [性能优化](./pitfalls/performance.md) - 代码分割、主包优化、画质分级、固定步进、粒子池
 4. [交互设计](./pitfalls/interaction.md) - 触摸反馈、手势支持
-5. [3D/WebGL 架构](./pitfalls/3d-webgl-architecture.md) - Canvas 生命周期、粒子分层、版本锁定、后处理、InstancedMesh
+5. [3D/WebGL 架构](./pitfalls/3d-webgl-architecture.md) - Canvas 生命周期、粒子分层、版本锁定、后处理、InstancedMesh、iframe 隔离、StrictMode 复用
 6. [数学优化推理](./pitfalls/math-optimization-reasoning.md) - 常数项倍乘、临界点跨越、枚举与构造脱节、多角度验证
 7. [单文件 HTML 轻量化部署](./pitfalls/single-file-html-deployment.md) - importmap/CDN/轻量级转移/材质共享/Vercel 缓存
 8. [Obsidian Vault 自动化](./pitfalls/obsidian-vault-automation.md) - iCloud 路径、frontmatter 解析、去个人化、wikilink 去重、Canvas JSON、Dataview 语法、scipy 降级、多 Agent 编排
@@ -174,6 +174,8 @@ git push origin main
    - [详细文档](./examples/obsidian-knowledge-system.md)
 7. **Hand-AR 数字化宇宙飞船展板** - Unity + MediaPipe 手势交互，三程序集分离，MCP 旋转 5x 稳定
    - [详细文档](./examples/hand-ar-spaceship.md)
+8. **蛋白质结构可视化工具** - Molstar + iframe 隔离，StrictMode iframe 复用，三层降级兜底
+   - [详细文档](./examples/protein-analysis.md)
 ---
 ## 维护规则
 新项目完成后，使用 extract-experience 约定指令提取经验（向 AI 说"用 product-design 技能执行 extract-experience"）：
